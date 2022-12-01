@@ -7,6 +7,7 @@ from cohortextractor import (
     filter_codes_by_category,
 )
 from codelists import *
+from common_variables import common_variables
 
 study = StudyDefinition(
     default_expectations={
@@ -22,7 +23,6 @@ study = StudyDefinition(
         (age >=18 AND age <= 110) AND
         (NOT died) AND
         (sex = 'M' OR sex = 'F') AND
-        (stp != 'missing') AND
         (imd != 0) AND
         (household>=1 AND household<=15)
         """,
@@ -31,60 +31,18 @@ study = StudyDefinition(
         ),
         died=patients.died_from_any_cause(
             on_or_before="index_date"
-            ),
-        stp=patients.registered_practice_as_of(
-            "index_date",
-            returning="stp_code",
-            return_expectations={
-               "category": {"ratios": {"STP1": 0.3, "STP2": 0.2, "STP3": 0.5}},
-            },
         ),
         household=patients.household_as_of(
             "2020-02-01",
             returning="household_size",
         ),
-        age=patients.age_as_of(
+    ),   
+    age=patients.age_as_of(
             "index_date",
             return_expectations={
                 "rate": "universal",
                 "int": {"distribution": "population_ages"},
             },
-        ),
-        # Sex
-        sex=patients.sex(
-            return_expectations={
-                "rate": "universal",
-                "category": {"ratios": {"M": 0.49, "F": 0.5, "U": 0.01}},
-            },
-        ),
-        imd=patients.categorised_as(
-            {
-            "0": "DEFAULT",
-            "1": """index_of_multiple_deprivation >=1 AND index_of_multiple_deprivation < 32844*1/5""",
-            "2": """index_of_multiple_deprivation >= 32844*1/5 AND index_of_multiple_deprivation < 32844*2/5""",
-            "3": """index_of_multiple_deprivation >= 32844*2/5 AND index_of_multiple_deprivation < 32844*3/5""",
-            "4": """index_of_multiple_deprivation >= 32844*3/5 AND index_of_multiple_deprivation < 32844*4/5""",
-            "5": """index_of_multiple_deprivation >= 32844*4/5 AND index_of_multiple_deprivation < 32844""",
-            },
-        index_of_multiple_deprivation=patients.address_as_of(
-            "index_date",
-            returning="index_of_multiple_deprivation",
-            round_to_nearest=100,
-            ),
-        return_expectations={
-            "rate": "universal",
-            "category": {
-                "ratios": {
-                    "0": 0.05,
-                    "1": 0.19,
-                    "2": 0.19,
-                    "3": 0.19,
-                    "4": 0.19,
-                    "5": 0.19,
-                    }
-                },
-            },
-        ),
     ),
     # Hospital admissions primary diagnosis - CVD
     # MI
@@ -117,37 +75,37 @@ study = StudyDefinition(
     ),
     # Hospital admissions - mental health
     depression_admission=patients.admitted_to_hospital(
-        with_these_diagnoses=depression_icd_codes,
+        with_these_primary_diagnoses=depression_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
     ),
     anxiety_admission=patients.admitted_to_hospital(
-        with_these_diagnoses=anxiety_icd_codes,
+        with_these_primary_diagnoses=anxiety_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
     ),
     smi_admission=patients.admitted_to_hospital(
-        with_these_diagnoses=severe_mental_illness_icd_codes,
+        with_these_primary_diagnoses=severe_mental_illness_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
     ),
     self_harm_admission=patients.admitted_to_hospital(
-        with_these_diagnoses=self_harm_icd_codes,
+        with_these_primary_diagnoses=self_harm_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
     ),
     eating_dis_admission=patients.admitted_to_hospital(
-        with_these_diagnoses=eating_disorder_icd_codes,
+        with_these_primary_diagnoses=eating_disorder_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
     ),
     ocd_admission=patients.admitted_to_hospital(
-        with_these_diagnoses=ocd_icd_codes,
+        with_these_primary_diagnoses=ocd_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
@@ -159,132 +117,44 @@ study = StudyDefinition(
         smi_admission OR
         self_harm_admission OR
         eating_dis_admission OR
-        ocd_admission OR
-        """
-    )
- )
-
+        ocd_admission
+        """,
+    ),
+)
 measures = [
-    # Clinical monitoring
+    # Hospital admissions for MI
     Measure(
-        id="bp_meas_cvd_ethnicity_rate",
-        numerator="bp_meas",
+        id="mi_admission_imd_rate",
+        numerator="mi_admission",
         denominator="population",
-        group_by=["ethnicity", "cvd_subgroup"],
+        group_by=["imd"],
     ),
+    # Hospital admissions for stroke
     Measure(
-        id="bp_meas_cvd_imd_rate",
-        numerator="bp_meas",
+        id="stroke_admission_imd_rate",
+        numerator="stroke_admission",
         denominator="population",
-        group_by=["imd", "cvd_subgroup"],
+        group_by=["imd"],
     ),
-    # Hospital admissions for MI
-    #Measure(
-    #    id="mi_admission_ethnicity_rate",
-    #    numerator="mi_admission",
-    #    denominator="population",
-    #    group_by=["ethnicity"],
-    #),
-    # Hospital admissions for MI
-    #Measure(
-    #    id="mi_admission_imd_rate",
-    #    numerator="mi_admission",
-    #    denominator="population",
-    #    group_by=["imd"],
-    #),
-    # Hospital admissions for stroke
-    #Measure(
-    #    id="stroke_admission_ethnicity_rate",
-    #    numerator="stroke_admission",
-    #    denominator="population",
-    #    group_by=["ethnicity"],
-    #),
-    # Hospital admissions for stroke
-    #Measure(
-    #    id="stroke_admission_imd_rate",
-    #    numerator="stroke_admission",
-    #    denominator="population",
-    #    group_by=["imd"],
-    #),
-    # Hospital admissions for heart failure
-    #Measure(
-    #    id="heart_failure_admission_ethnicity_rate",
-    #    numerator="heart_failure_admission",
-    #    denominator="population",
-    #    group_by=["ethnicity"],
-    #),
-    #Measure(
-    #    id="heart_failure_admission_imd_rate",
-    #    numerator="heart_failure_admission",
-    #    denominator="population",
-    #    group_by=["imd"],
-    #),
-    # Hospital admissions for VTE
-    #Measure(
-    #    id="vte_admission_ethnicity_rate",
-    #    numerator="vte_admission",
-    #    denominator="population",
-    #    group_by=["ethnicity"],
-    #),
-    #Measure(
-    #    id="vte_admission_imd_rate",
-    #    numerator="vte_admission",
-    #    denominator="population",
-    #    group_by=["imd"],
-    #),
-    # Hospital admissions for primary diagnosis MI
-    #Measure(
-    #    id="mi_primary_admission_ethnicity_rate",
-    #    numerator="mi_primary_admission",
-    #    denominator="population",
-    #    group_by=["ethnicity"],
-    #),
-    # Hospital admissions for MI
-    #Measure(
-    #    id="mi_primary_admission_imd_rate",
-    #    numerator="mi_primary_admission",
-    #    denominator="population",
-    #    group_by=["imd"],
-    #),
-    # Hospital admissions for stroke
-    #Measure(
-    #    id="stroke_primary_admission_ethnicity_rate",
-    #    numerator="stroke_primary_admission",
-    #    denominator="population",
-    #    group_by=["ethnicity"],
-    #),
-    # Hospital admissions for stroke
-    #Measure(
-    #    id="stroke_primary_admission_imd_rate",
-    #    numerator="stroke_primary_admission",
-    #    denominator="population",
-    #    group_by=["imd"],
-    #),
-    # Hospital admissions for heart failure
-    #Measure(
-    #    id="heart_failure_primary_admission_ethnicity_rate",
-    #    numerator="heart_failure_primary_admission",
-    #    denominator="population",
-    #    group_by=["ethnicity"],
-    #),
-    #Measure(
-    #    id="heart_failure_primary_admission_imd_rate",
-    #    numerator="heart_failure_primary_admission",
-    #    denominator="population",
-    #    group_by=["imd"],
-    #),
-    # Hospital admissions for VTE
-   #Measure(
-    #    id="vte_primary_admission_ethnicity_rate",
-    #    numerator="vte_primary_admission",
-    #    denominator="population",
-    #    group_by=["ethnicity"],
-    #),
-    #Measure(
-    #    id="vte_primary_admission_imd_rate",
-    #    numerator="vte_primary_admission",
-    #    denominator="population",
-    #    group_by=["imd"],
-    #),
-
+    # Hospital admission for heart failure
+    Measure(
+        id="heart_failure_admission_imd_rate",
+        numerator="heart_failure_admission",
+        denominator="population",
+        group_by=["imd"],
+    ),
+    # Hospital admission for vte
+    Measure(
+        id="vte_admission_imd_rate",
+        numerator="vte_admission",
+        denominator="population",
+        group_by=["imd"],
+    ),
+    # Hospital admission for mental health
+    Measure(
+        id="mh_admission_imd_rate",
+        numerator="mh_admission",
+        denominator="population",
+        group_by=["imd"],
+    ),
 ]

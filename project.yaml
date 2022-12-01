@@ -10,3 +10,12 @@ actions:
     outputs:
       highly_sensitive:
         cohort: output/input.csv
+
+  generate_study_population_static:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_static
+    outputs:
+      highly_sensitive:
+        cohort: output/input_static.csv
+
+  calculate_measures:
+    run: 

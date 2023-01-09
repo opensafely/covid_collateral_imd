@@ -4,7 +4,8 @@ For this dataset, each month (March 2018 to April 2022 (or later date)), the den
 
 | Variable    |Variable type          |	Description                                                                                      |
 |------       |-------------          |---------------                                                                                   |
-| IMD         |Categorical (1-5)      |	IMD quintile                                                                                     |
+| IMD         |Categorical (1-5)      |	IMD quintile 
+| Migrant  |Binary                    | Migration status (Yes/No)
 | bp_meas     |Numeric                | Number of people with the outcome – for this dataset it is blood pressure measurement (bp_meas). |
 | population  |Numeric                |	Number of people in the whole population as of date                                              |
 | value       |Value between 0 and 1  |	Proportion of population with the outcome                                                        |

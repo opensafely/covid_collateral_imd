@@ -113,6 +113,12 @@
       "url": "https://codelists.opensafely.org/codelist/user/hjforbes/suicide-icd-10/3b53a18e/",
       "downloaded_at": "2022-12-01 14:09:41.393693Z",
       "sha": "806be08bebc267e8abb26b8ceeefd713dacb1eb8"
+    },
+    "user-ruthcostello-migration_status.csv": {
+      "id": "user/ruthcostello/migration_status/00a22669",
+      "url": "https://codelists.opensafely.org/codelist/user/ruthcostello/migration_status/00a22669/",
+      "downloaded_at": "2023-02-17 15:47:02.201933Z",
+      "sha": "b26de8e743d4c69917ddd7acd90bef926038a371"
     }
   }
 }

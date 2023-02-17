@@ -88,4 +88,11 @@ study = StudyDefinition(
     ),
 
     # Add migration status once have code list
+    # Migration status
+    migration_status=patients.with_these_clinical_events(
+        migration_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence":0.2,},
+    ),
 )

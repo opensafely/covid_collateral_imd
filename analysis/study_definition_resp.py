@@ -240,4 +240,38 @@ measures = [
         denominator="has_copd",
         group_by=["imd"],
     ),
+
+    # by migration status
+    Measure(
+        id="resp_asthma_exacerbation_migration_status_rate",
+        numerator="asthma_exacerbation",
+        denominator="has_asthma",
+        group_by=["migration_status"],
+    ),
+    # Hospital admission for copd in those with copd
+    # by migration_status
+    Measure(
+        id="resp_copd_exacerbation_migration_status_rate",
+        numerator="copd_exacerbation",
+        denominator="has_copd",
+        group_by=["migration_status"],
+    ),
+    Measure(
+        id="resp_copd_exac_nolrti_migration_status_rate",
+        numerator="copd_exacerbation_nolrti",
+        denominator="has_copd",
+        group_by=["migration_status"],
+    ),
+     Measure(
+        id="resp_asthma_mortality_migration_status_rate",
+        numerator="asthma_mortality",
+        denominator="has_asthma",
+        group_by=["migration_status"],
+    ),
+    Measure(
+        id="resp_copd_mortality_migration_status_rate",
+        numerator="copd_mortality",
+        denominator="has_copd",
+        group_by=["migration_status"],
+    ),
 ]

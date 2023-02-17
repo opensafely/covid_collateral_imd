@@ -95,3 +95,11 @@ actions:
     outputs:
       moderately_sensitive:
         measure: output/measures/joined/measure_resp_*_rate.csv
+
+  create_baseline_tables:
+    run: stata-mp:latest analysis/101_baseline_tables.do
+    needs: [join_cohorts]
+    outputs:
+      moderately_sensitive:
+        log: logs/table1_descriptives.log
+        output: output/tables/baseline_table_*.csv

@@ -62,7 +62,7 @@ study = StudyDefinition(
             "index_date",
             returning="msoa",
         ),
-        return_expectations={"incidence": 0.95}
+        return_expectations={"incidence": 1.0}
         ),
         imd=patients.categorised_as(
             {
@@ -198,5 +198,49 @@ measures = [
         numerator="dm_keto_mortality",
         denominator="population",
         group_by=["imd"],
+    ),
+
+    # Generate summary data by migration status for each outcome
+    # Primary admission code type 1 DM
+    Measure(
+        id="dm_t1_migration_status_rate",
+        numerator="t1dm_admission",
+        denominator="has_t1_diabetes",
+        group_by=["migration_status"],
+    ),
+    # Primary admission code type 2 DM
+    Measure(
+        id="dm_t2_migration_status_rate",
+        numerator="t2dm_admission",
+        denominator="has_t2_diabetes",
+        group_by=["migration_status"],
+    ),
+    # Primary admission code ketoacidosis
+    Measure(
+        id="dm_keto_migration_status_rate",
+        numerator="dm_keto_admission",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+    # Death underlying cause code type 1 DM
+    Measure(
+        id="dm_t1_mortality_migration_status_rate",
+        numerator="t1dm_mortality",
+        denominator="has_t1_diabetes",
+        group_by=["migration_status"],
+    ),
+    # Death underlying cause code type 2 DM
+    Measure(
+        id="dm_t2_mortality_migration_status_rate",
+        numerator="t2dm_mortality",
+        denominator="has_t2_diabetes",
+        group_by=["migration_status"],
+    ),
+    # Death underlying cause code ketoacidosis
+    Measure(
+        id="dm_keto_mortality_migration_status_rate",
+        numerator="dm_keto_mortality",
+        denominator="population",
+        group_by=["migration_status"],
     ),
 ]

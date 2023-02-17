@@ -98,7 +98,49 @@ study = StudyDefinition(
                 },
             },
         ),
-    ),   
+    ), 
+    # Subgroups
+    has_t1_diabetes=patients.with_these_clinical_events(
+        t1dm_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence":0.2,}
+        ),
+    has_t2_diabetes=patients.with_these_clinical_events(
+        t2dm_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence":0.8,}
+        ),
+    diabetes_subgroup=patients.satisfying(
+        """
+        has_t1_diabetes OR 
+        has_t2_diabetes
+        """,
+    ),
+
+    has_asthma=patients.with_these_clinical_events(
+        asthma_codes,
+        between=["index_date - 3 years", "index_date"],
+        returning="binary_flag",
+        return_expectations={"incidence":0.2,}
+        ),
+    has_copd=patients.satisfying(
+    """has_copd_code AND age40>40""",
+        has_copd_code=patients.with_these_clinical_events(
+        copd_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence":0.8,}
+        ),
+        age40=patients.age_as_of(
+            "index_date",
+            return_expectations={
+                "rate": "universal",
+                "int": {"distribution": "population_ages"},
+            },
+        ),
+    ),  
     # Hospital admissions primary diagnosis - CVD
     # MI
     mi_admission=patients.admitted_to_hospital(
@@ -285,5 +327,77 @@ measures = [
         denominator="population",
         group_by=["imd"],
     ),
+    # Same for migration status
+        # Hospital admissions for MI
+    Measure(
+        id="mi_admission_migration_status_rate",
+        numerator="mi_admission",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+    # Hospital admissions for stroke
+    Measure(
+        id="stroke_admission_migration_status_rate",
+        numerator="stroke_admission",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+    # Hospital admission for heart failure
+    Measure(
+        id="heart_failure_admission_migration_status_rate",
+        numerator="heart_failure_admission",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+    # Hospital admission for vte
+    Measure(
+        id="vte_admission_migration_status_rate",
+        numerator="vte_admission",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+    # Hospital admission for mental health
+    Measure(
+        id="mh_admission_migration_status_rate",
+        numerator="mh_admission",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
 
+    # Deaths for CVD outcomes
+    Measure(
+        id="mi_mortality_migration_status_rate",
+        numerator="mi_mortality",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+
+    Measure(
+        id="stroke_mortality_migration_status_rate",
+        numerator="stroke_mortality",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+
+    Measure(
+        id="vte_mortality_migration_status_rate",
+        numerator="vte_mortality",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+
+    Measure(
+        id="heart_failure_mortality_migration_status_rate",
+        numerator="heart_failure_mortality",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
+
+     # Hospital admission for mental health
+    Measure(
+        id="mh_mortality_migration_status_rate",
+        numerator="mh_mortality",
+        denominator="population",
+        group_by=["migration_status"],
+    ),
 ]

@@ -8,14 +8,14 @@ Description:    Generates line graphs of rates of each outcome and strata per mo
 cap log using ./logs/graphs.log, replace
 cap mkdir ./output/graphs
 
-* Generates graphs for each outcome
-local outcomes "mi_admission stroke_admission heart_failure_admission vte_admission mh_admission dm_t1 dm_t2 dm_keto resp_asthma_exacerbation resp_copd_exacerbation resp_copd_exac_nolrti"
-local file "joined joined joined joined joined dm dm dm resp resp resp"
+local outcomes "mi_admission stroke_admission heart_failure_admission vte_admission mh_admission dmt1_admission dmt2_admission dm_keto_admission resp_asthma_exac resp_copd_exac resp_copd_exac_nolrti"
+local file "population population population population population has_t1_diabetes has_t2_diabetes population has_asthma has_copd has_copd"
 forvalues i=1/11 {
     local this_outcome: word `i' of `outcomes'
-    local this_folder: word `i' of `file'
+    local population: word `i' of `file'
+* Generates graphs for each outcome
 * IMD
-        import delimited using ./output/measures/`this_folder'/measure_`this_outcome'_imd_rate.csv, numericcols(4) clear
+        import delimited using ./output/measures/joined/measure_`this_outcome'_imd_rate.csv, numericcols(4) clear
         * IMD shouldn't be missing 
         count if imd==.
         * drop missings (should only be in dummy data)
@@ -27,7 +27,7 @@ forvalues i=1/11 {
         drop date
         format dateA %dD/M/Y
         * reshape dataset so columns with rates for each ethnicity 
-        reshape wide value rate population `this_outcome', i(dateA) j(imd)
+        reshape wide value rate `population' `this_outcome', i(dateA) j(imd)
         describe
         * Labelling ethnicity variables
         label var rate1 "IMD 1"
@@ -66,9 +66,9 @@ forvalues i=1/11 {
         export delimited using ./output/graphs/line_data_`this_outcome'_diff_imd.csv
     }
 
-foreach this_group in mi stroke heart_failure vte mh {
+foreach this_outcome in mi_admission stroke_admission heart_failure_admission vte_admission mh_admission dm_t1 dm_t2 dm_keto resp_asthma_exacerbation resp_copd_exacerbation resp_copd_exac_nolrti {
 * Migration status
-        import delimited using ./output/measures/`this_folder'/measure_`this_outcome'_migration_status_rate.csv, numericcols(4) clear
+        import delimited using ./output/measures/joined/measure_`this_outcome'_migration_status_rate.csv, numericcols(4) clear
         * migration status shouldn't be missing 
         count if migration_status==.
         * drop missings (should only be in dummy data)
@@ -80,7 +80,7 @@ foreach this_group in mi stroke heart_failure vte mh {
         drop date
         format dateA %dD/M/Y
         * reshape dataset so columns with rates for each ethnicity 
-        reshape wide value rate population `this_outcome', i(dateA) j(migration_status)
+        reshape wide value rate `population' `this_outcome', i(dateA) j(migration_status)
         describe
 
         * Generate line graph

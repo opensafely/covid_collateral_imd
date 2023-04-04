@@ -65,7 +65,7 @@ actions:
     needs: [join_cohorts_dm]
     outputs:
       moderately_sensitive:
-        measure: output/measures/joined/measure_dm_*_rate.csv
+        measure: output/measures/joined/measure_dm*_rate.csv
 
 # Respiratory subpopulation
   generate_study_population_resp:
@@ -106,7 +106,7 @@ actions:
 
   graphs:
     run: stata-mp:latest analysis/102_graphs.do
-    needs: [calculate_measures]
+    needs: [calculate_measures, calculate_measures_dm, calculate_measures_resp]
     outputs:
       moderately_sensitive:
         log: logs/graphs.log

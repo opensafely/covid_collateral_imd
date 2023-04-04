@@ -114,14 +114,14 @@ study = StudyDefinition(
     ),
      # Inpatient admission with primary code of diabetes 
     # Type 1 DM
-    t1dm_admission=patients.admitted_to_hospital(
+    dmt1_admission=patients.admitted_to_hospital(
         with_these_primary_diagnoses=t1dm_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
     ),
     # Type 2 DM
-    t2dm_admission=patients.admitted_to_hospital(
+    dmt2_admission=patients.admitted_to_hospital(
         with_these_primary_diagnoses=t2dm_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
@@ -135,13 +135,13 @@ study = StudyDefinition(
         return_expectations={"incidence": 0.1},
     ),
     # Death outcomes
-    t1dm_mortality = patients.with_these_codes_on_death_certificate(
+    dmt1_mortality = patients.with_these_codes_on_death_certificate(
     t1dm_icd_codes,
     between=["index_date", "last_day_of_month(index_date)"],
     match_only_underlying_cause=True,
     returning="binary_flag",
     ),
-    t2dm_mortality = patients.with_these_codes_on_death_certificate(
+    dmt2_mortality = patients.with_these_codes_on_death_certificate(
     t2dm_icd_codes,
     between=["index_date", "last_day_of_month(index_date)"],
     match_only_underlying_cause=True,
@@ -159,36 +159,36 @@ measures = [
 # Generate summary data by IMD for each outcome
     # Primary admission code type 1 DM
     Measure(
-        id="dm_t1_imd_rate",
-        numerator="t1dm_admission",
+        id="dmt1_admission_imd_rate",
+        numerator="dmt1_admission",
         denominator="has_t1_diabetes",
         group_by=["imd"],
     ),
     # Primary admission code type 2 DM
     Measure(
-        id="dm_t2_imd_rate",
-        numerator="t2dm_admission",
+        id="dmt2_admission_imd_rate",
+        numerator="dmt2_admission",
         denominator="has_t2_diabetes",
         group_by=["imd"],
     ),
     # Primary admission code ketoacidosis
     Measure(
-        id="dm_keto_imd_rate",
+        id="dm_keto_admission_imd_rate",
         numerator="dm_keto_admission",
         denominator="population",
         group_by=["imd"],
     ),
     # Death underlying cause code type 1 DM
     Measure(
-        id="dm_t1_mortality_imd_rate",
-        numerator="t1dm_mortality",
+        id="dmt1_mortality_imd_rate",
+        numerator="dmt1_mortality",
         denominator="has_t1_diabetes",
         group_by=["imd"],
     ),
     # Death underlying cause code type 2 DM
     Measure(
-        id="dm_t2_mortality_imd_rate",
-        numerator="t2dm_mortality",
+        id="dmt2_mortality_imd_rate",
+        numerator="dmt2_mortality",
         denominator="has_t2_diabetes",
         group_by=["imd"],
     ),
@@ -203,36 +203,36 @@ measures = [
     # Generate summary data by migration status for each outcome
     # Primary admission code type 1 DM
     Measure(
-        id="dm_t1_migration_status_rate",
-        numerator="t1dm_admission",
+        id="dmt1_admission_migration_status_rate",
+        numerator="dmt1_admission",
         denominator="has_t1_diabetes",
         group_by=["migration_status"],
     ),
     # Primary admission code type 2 DM
     Measure(
-        id="dm_t2_migration_status_rate",
-        numerator="t2dm_admission",
+        id="dmt2_admission_migration_status_rate",
+        numerator="dmt2_admission",
         denominator="has_t2_diabetes",
         group_by=["migration_status"],
     ),
     # Primary admission code ketoacidosis
     Measure(
-        id="dm_keto_migration_status_rate",
+        id="dm_keto_admission_migration_status_rate",
         numerator="dm_keto_admission",
         denominator="population",
         group_by=["migration_status"],
     ),
     # Death underlying cause code type 1 DM
     Measure(
-        id="dm_t1_mortality_migration_status_rate",
-        numerator="t1dm_mortality",
+        id="dmt1_mortality_migration_status_rate",
+        numerator="dmt1_mortality",
         denominator="has_t1_diabetes",
         group_by=["migration_status"],
     ),
     # Death underlying cause code type 2 DM
     Measure(
-        id="dm_t2_mortality_migration_status_rate",
-        numerator="t2dm_mortality",
+        id="dmt2_mortality_migration_status_rate",
+        numerator="dmt2_mortality",
         denominator="has_t2_diabetes",
         group_by=["migration_status"],
     ),

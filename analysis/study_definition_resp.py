@@ -121,7 +121,7 @@ study = StudyDefinition(
     ),
         
     # Hospital admission - COPD exacerbation
-    copd_exacerbation=patients.satisfying(
+    resp_copd_exac=patients.satisfying(
         """copd_exacerbation_hospital OR 
         copd_hospital OR 
         (lrti_hospital AND copd_any)""",
@@ -150,7 +150,7 @@ study = StudyDefinition(
             return_expectations={"incidence": 0.1},
         ),
     ),
-    copd_exacerbation_nolrti=patients.satisfying(
+    resp_copd_exac_nolrti=patients.satisfying(
         """
         copd_exacerbation_hospital2 OR 
         copd_hospital2
@@ -168,7 +168,7 @@ study = StudyDefinition(
             return_expectations={"incidence": 0.1},
             ),
     ),
-    asthma_exacerbation=patients.admitted_to_hospital(
+    resp_asthma_exac=patients.admitted_to_hospital(
         with_these_primary_diagnoses=asthma_exacerbation_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         returning="binary_flag",
@@ -176,29 +176,29 @@ study = StudyDefinition(
     ),
     # No need to do primary and any code for hospital admissions because 
     # of the way asthma and copd exacerbation are defined
-    asthma_mortality=patients.with_these_codes_on_death_certificate(
+    resp_asthma_mortality=patients.with_these_codes_on_death_certificate(
         asthma_exacerbation_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         match_only_underlying_cause=True,
         returning="binary_flag",
     ),
-    copd_exac_mortality=patients.with_these_codes_on_death_certificate(
+    resp_copd_exac_mortality=patients.with_these_codes_on_death_certificate(
         copd_exacerbation_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         match_only_underlying_cause=True,
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
         ),
-    copd_diag_mortality=patients.with_these_codes_on_death_certificate(
+    resp_copd_diag_mortality=patients.with_these_codes_on_death_certificate(
         copd_icd_codes,
         between=["index_date", "last_day_of_month(index_date)"],
         match_only_underlying_cause=True,
         returning="binary_flag",
         return_expectations={"incidence": 0.1},
         ),
-    copd_mortality=patients.satisfying(
-        """copd_exac_mortality OR 
-        copd_diag_mortality """,
+    resp_copd_mortality=patients.satisfying(
+        """resp_copd_exac_mortality OR 
+        resp_copd_diag_mortality """,
         ),
     #**common_variables
 )
@@ -209,68 +209,68 @@ measures = [
     # Hospital admission for asthma in those with asthma
     # by IMD
     Measure(
-        id="resp_asthma_exacerbation_imd_rate",
-        numerator="asthma_exacerbation",
+        id="resp_asthma_exac_imd_rate",
+        numerator="resp_asthma_exac",
         denominator="has_asthma",
         group_by=["imd"],
     ),
     # Hospital admission for copd in those with copd
     # by IMD
     Measure(
-        id="resp_copd_exacerbation_imd_rate",
-        numerator="copd_exacerbation",
+        id="resp_copd_exac_imd_rate",
+        numerator="resp_copd_exac",
         denominator="has_copd",
         group_by=["imd"],
     ),
     Measure(
         id="resp_copd_exac_nolrti_imd_rate",
-        numerator="copd_exacerbation_nolrti",
+        numerator="resp_copd_exac_nolrti",
         denominator="has_copd",
         group_by=["imd"],
     ),
      Measure(
         id="resp_asthma_mortality_imd_rate",
-        numerator="asthma_mortality",
+        numerator="resp_asthma_mortality",
         denominator="has_asthma",
         group_by=["imd"],
     ),
     Measure(
         id="resp_copd_mortality_imd_rate",
-        numerator="copd_mortality",
+        numerator="resp_copd_mortality",
         denominator="has_copd",
         group_by=["imd"],
     ),
 
     # by migration status
     Measure(
-        id="resp_asthma_exacerbation_migration_status_rate",
-        numerator="asthma_exacerbation",
+        id="resp_asthma_exac_migration_status_rate",
+        numerator="resp_asthma_exac",
         denominator="has_asthma",
         group_by=["migration_status"],
     ),
     # Hospital admission for copd in those with copd
     # by migration_status
     Measure(
-        id="resp_copd_exacerbation_migration_status_rate",
-        numerator="copd_exacerbation",
+        id="resp_copd_exac_migration_status_rate",
+        numerator="resp_copd_exac",
         denominator="has_copd",
         group_by=["migration_status"],
     ),
     Measure(
         id="resp_copd_exac_nolrti_migration_status_rate",
-        numerator="copd_exacerbation_nolrti",
+        numerator="resp_copd_exac_nolrti",
         denominator="has_copd",
         group_by=["migration_status"],
     ),
      Measure(
         id="resp_asthma_mortality_migration_status_rate",
-        numerator="asthma_mortality",
+        numerator="resp_asthma_mortality",
         denominator="has_asthma",
         group_by=["migration_status"],
     ),
     Measure(
         id="resp_copd_mortality_migration_status_rate",
-        numerator="copd_mortality",
+        numerator="resp_copd_mortality",
         denominator="has_copd",
         group_by=["migration_status"],
     ),

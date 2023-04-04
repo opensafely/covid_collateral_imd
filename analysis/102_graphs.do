@@ -15,7 +15,7 @@ forvalues i=1/11 {
     local this_outcome: word `i' of `outcomes'
     local this_folder: word `i' of `file'
 * IMD
-        import delimited using ./output/measures/joined/measure_`this_group'_admission_imd_rate.csv, numericcols(4) clear
+        import delimited using ./output/measures/`this_folder'/measure_`this_outcome'_imd_rate.csv, numericcols(4) clear
         * IMD shouldn't be missing 
         count if imd==.
         * drop missings (should only be in dummy data)
@@ -27,7 +27,7 @@ forvalues i=1/11 {
         drop date
         format dateA %dD/M/Y
         * reshape dataset so columns with rates for each ethnicity 
-        reshape wide value rate population `this_group'_admission, i(dateA) j(imd)
+        reshape wide value rate population `this_outcome', i(dateA) j(imd)
         describe
         * Labelling ethnicity variables
         label var rate1 "IMD 1"
@@ -42,7 +42,7 @@ forvalues i=1/11 {
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
         title("Ethnic categories", size(small))) graphregion(fcolor(white))
 
-        graph export ./output/graphs/line_`this_group'_admission_imd.svg, as(svg) replace
+        graph export ./output/graphs/line_`this_outcome'_imd.svg, as(svg) replace
 
         * Plotting first derivative i.e. difference between current rate and previous months rate
         forvalues j=1/5 {
@@ -61,15 +61,15 @@ forvalues i=1/11 {
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
         title("Ethnic categories", size(small))) graphregion(fcolor(white))
 
-        graph export ./output/graphs/line_`this_group'_admission_diff_imd.svg, as(svg) replace
+        graph export ./output/graphs/line_`this_outcome'_diff_imd.svg, as(svg) replace
         * Export data file for output checking 
-        export delimited using ./output/graphs/line_data_`this_group'_admission_diff_imd.csv
+        export delimited using ./output/graphs/line_data_`this_outcome'_diff_imd.csv
     }
 
 foreach this_group in mi stroke heart_failure vte mh {
 * Migration status
-        import delimited using ./output/measures/joined/measure_`this_group'_admission_migration_status_rate.csv, numericcols(4) clear
-        * IMD shouldn't be missing 
+        import delimited using ./output/measures/`this_folder'/measure_`this_outcome'_migration_status_rate.csv, numericcols(4) clear
+        * migration status shouldn't be missing 
         count if migration_status==.
         * drop missings (should only be in dummy data)
         drop if migration_status==.
@@ -80,7 +80,7 @@ foreach this_group in mi stroke heart_failure vte mh {
         drop date
         format dateA %dD/M/Y
         * reshape dataset so columns with rates for each ethnicity 
-        reshape wide value rate population `this_group'_admission, i(dateA) j(migration_status)
+        reshape wide value rate population `this_outcome', i(dateA) j(migration_status)
         describe
 
         * Generate line graph
@@ -89,7 +89,7 @@ foreach this_group in mi stroke heart_failure vte mh {
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
         title("Ethnic categories", size(small))) graphregion(fcolor(white))
 
-        graph export ./output/graphs/line_`this_group'_admission_migration_status.svg, as(svg) replace
+        graph export ./output/graphs/line_`this_outcome'_migration_status.svg, as(svg) replace
 
         * Plotting first derivative i.e. difference between current rate and previous months rate
         forvalues j=0/1 {
@@ -103,8 +103,8 @@ foreach this_group in mi stroke heart_failure vte mh {
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
         title("Ethnic categories", size(small))) graphregion(fcolor(white))
 
-        graph export ./output/graphs/line_`this_group'_admission_diff_migration_status.svg, as(svg) replace
+        graph export ./output/graphs/line_`this_outcome'_diff_migration_status.svg, as(svg) replace
         * Export data file for output checking 
-        export delimited using ./output/graphs/line_data_`this_group'_admission_diff_migration_status.csv
+        export delimited using ./output/graphs/line_data_`this_outcome'_diff_migration_status.csv
     }
 

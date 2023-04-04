@@ -1,0 +1,687 @@
+
+. cap mkdir ./output/graphs
+
+. 
+. * Generates graphs for each outcome
+. foreach this_group in mi stroke heart_failure vte mh {
+  2. * IMD
+.         import delimited using ./output/measures/joined/measure_`this_group'_
+> admission_imd_rate.csv, numericcols(4) clear
+  3.         * IMD shouldn't be missing 
+.         count if imd==.
+  4.         * drop missings (should only be in dummy data)
+.         drop if imd==.
+  5.         * Generate rate per 100,000
+.         gen rate = value*100000 
+  6.         * Format date
+.         gen dateA = date(date, "YMD")
+  7.         drop date
+  8.         format dateA %dD/M/Y
+  9.         * reshape dataset so columns with rates for each ethnicity 
+.         reshape wide value rate population `this_group'_admission, i(dateA) j
+> (imd)
+ 10.         describe
+ 11.         * Labelling ethnicity variables
+.         label var rate1 "IMD 1"
+ 12.         label var rate2 "IMD 2"
+ 13.         label var rate3 "IMD 3"
+ 14.         label var rate4 "IMD 4"
+ 15.         label var rate5 "IMD 5"
+ 16. 
+.         * Generate line graph
+.         graph twoway line rate1 rate2 rate3 rate4 rate5 date, tlabel(01Jan201
+> 8(120)31Dec2021, angle(45) ///
+>         format(%dM-CY) labsize(small)) ytitle("Rate per 100,000") xtitle("Dat
+> e") ylabel(#5, labsize(small) ///
+>         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(s
+> mall) ///
+>         title("Ethnic categories", size(small))) graphregion(fcolor(white))
+ 17. 
+.         graph export ./output/graphs/line_`this_group'_admission_imd.svg, as(
+> svg) replace
+ 18. 
+.         * Plotting first derivative i.e. difference between current rate and 
+> previous months rate
+.         forvalues i=1/5 {
+ 19.             sort dateA
+ 20.             gen first_derivative`i' = rate`i' - rate`i'[_n-1]
+ 21.             }
+ 22.         * Label variables 
+.         label var first_derivative1 "IMD 1"
+ 23.         label var first_derivative2 "IMD 2"
+ 24.         label var first_derivative3 "IMD 3"
+ 25.         label var first_derivative4 "IMD 4"
+ 26.         label var first_derivative5 "IMD 5"
+ 27.         * Plot this
+.         graph twoway line first_derivative1 first_derivative2 first_derivativ
+> e3 first_derivative4 first_derivative5 date, tlabel(01Jan2018(120)31Dec2021, 
+> angle(45) ///
+>         format(%dM-CY) labsize(small)) ytitle("Difference per 100,000") xtitl
+> e("Date") ylabel(#5, labsize(small) ///
+>         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(s
+> mall) ///
+>         title("Ethnic categories", size(small))) graphregion(fcolor(white))
+ 28. 
+.         graph export ./output/graphs/line_`this_group'_admission_diff_imd.svg
+> , as(svg) replace
+ 29.         * Export data file for output checking 
+.         export delimited using ./output/graphs/line_data_`this_group'_admissi
+> on_diff_imd.csv
+ 30.     }
+(5 vars, 322 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1 2 3 4 5)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                      276   ->      46
+Number of variables                   6   ->      25
+j variable (6 values)               imd   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1 ... value5
+                                   rate   ->   rate0 rate1 ... rate5
+                             population   ->   population0 population1 ... popu
+> lation5
+                           mi_admission   ->   mi_admission0 mi_admission1 ... 
+> mi_admission5
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:            25                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+mi_admission0   byte    %8.0g                 0 mi_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+mi_admission1   byte    %8.0g                 1 mi_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+mi_admission2   byte    %8.0g                 2 mi_admission
+population2     int     %8.0g                 2 population
+value2          float   %9.0g                 2 value
+rate2           float   %9.0g                 2 rate
+mi_admission3   byte    %8.0g                 3 mi_admission
+population3     int     %8.0g                 3 population
+value3          float   %9.0g                 3 value
+rate3           float   %9.0g                 3 rate
+mi_admission4   byte    %8.0g                 4 mi_admission
+population4     int     %8.0g                 4 population
+value4          float   %9.0g                 4 value
+rate4           float   %9.0g                 4 rate
+mi_admission5   byte    %8.0g                 5 mi_admission
+population5     int     %8.0g                 5 population
+value5          float   %9.0g                 5 value
+rate5           float   %9.0g                 5 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_mi_admission_imd.svg not found)
+(file ./output/graphs/line_mi_admission_imd.svg written in SVG format)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_mi_admission_diff_imd.svg not found)
+(file ./output/graphs/line_mi_admission_diff_imd.svg written in SVG format)
+file ./output/graphs/line_data_mi_admission_diff_imd.csv saved
+(5 vars, 322 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1 2 3 4 5)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                      276   ->      46
+Number of variables                   6   ->      25
+j variable (6 values)               imd   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1 ... value5
+                                   rate   ->   rate0 rate1 ... rate5
+                             population   ->   population0 population1 ... popu
+> lation5
+                       stroke_admission   ->   stroke_admission0 stroke_admissi
+> on1 ... stroke_admission5
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:            25                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+stroke_admiss~0 byte    %8.0g                 0 stroke_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+stroke_admiss~1 byte    %8.0g                 1 stroke_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+stroke_admiss~2 byte    %8.0g                 2 stroke_admission
+population2     int     %8.0g                 2 population
+value2          float   %9.0g                 2 value
+rate2           float   %9.0g                 2 rate
+stroke_admiss~3 byte    %8.0g                 3 stroke_admission
+population3     int     %8.0g                 3 population
+value3          float   %9.0g                 3 value
+rate3           float   %9.0g                 3 rate
+stroke_admiss~4 byte    %8.0g                 4 stroke_admission
+population4     int     %8.0g                 4 population
+value4          float   %9.0g                 4 value
+rate4           float   %9.0g                 4 rate
+stroke_admiss~5 byte    %8.0g                 5 stroke_admission
+population5     int     %8.0g                 5 population
+value5          float   %9.0g                 5 value
+rate5           float   %9.0g                 5 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_stroke_admission_imd.svg not found)
+(file ./output/graphs/line_stroke_admission_imd.svg written in SVG format)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_stroke_admission_diff_imd.svg not found)
+(file ./output/graphs/line_stroke_admission_diff_imd.svg written in SVG format)
+file ./output/graphs/line_data_stroke_admission_diff_imd.csv saved
+(5 vars, 322 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1 2 3 4 5)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                      276   ->      46
+Number of variables                   6   ->      25
+j variable (6 values)               imd   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1 ... value5
+                                   rate   ->   rate0 rate1 ... rate5
+                             population   ->   population0 population1 ... popu
+> lation5
+                heart_failure_admission   ->   heart_failure_admission0 heart_f
+> ailure_admission1 ... heart_failure_admission5
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:            25                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+heart_failure~0 byte    %8.0g                 0 heart_failure_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+heart_failure~1 byte    %8.0g                 1 heart_failure_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+heart_failure~2 byte    %8.0g                 2 heart_failure_admission
+population2     int     %8.0g                 2 population
+value2          float   %9.0g                 2 value
+rate2           float   %9.0g                 2 rate
+heart_failure~3 byte    %8.0g                 3 heart_failure_admission
+population3     int     %8.0g                 3 population
+value3          float   %9.0g                 3 value
+rate3           float   %9.0g                 3 rate
+heart_failure~4 byte    %8.0g                 4 heart_failure_admission
+population4     int     %8.0g                 4 population
+value4          float   %9.0g                 4 value
+rate4           float   %9.0g                 4 rate
+heart_failure~5 byte    %8.0g                 5 heart_failure_admission
+population5     int     %8.0g                 5 population
+value5          float   %9.0g                 5 value
+rate5           float   %9.0g                 5 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_heart_failure_admission_imd.svg not found)
+(file ./output/graphs/line_heart_failure_admission_imd.svg written in SVG forma
+> t)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_heart_failure_admission_diff_imd.svg not found
+> )
+(file ./output/graphs/line_heart_failure_admission_diff_imd.svg written in SVG 
+> format)
+file ./output/graphs/line_data_heart_failure_admission_diff_imd.csv saved
+(5 vars, 322 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1 2 3 4 5)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                      276   ->      46
+Number of variables                   6   ->      25
+j variable (6 values)               imd   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1 ... value5
+                                   rate   ->   rate0 rate1 ... rate5
+                             population   ->   population0 population1 ... popu
+> lation5
+                          vte_admission   ->   vte_admission0 vte_admission1 ..
+> . vte_admission5
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:            25                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+vte_admission0  byte    %8.0g                 0 vte_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+vte_admission1  byte    %8.0g                 1 vte_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+vte_admission2  byte    %8.0g                 2 vte_admission
+population2     int     %8.0g                 2 population
+value2          float   %9.0g                 2 value
+rate2           float   %9.0g                 2 rate
+vte_admission3  byte    %8.0g                 3 vte_admission
+population3     int     %8.0g                 3 population
+value3          float   %9.0g                 3 value
+rate3           float   %9.0g                 3 rate
+vte_admission4  byte    %8.0g                 4 vte_admission
+population4     int     %8.0g                 4 population
+value4          float   %9.0g                 4 value
+rate4           float   %9.0g                 4 rate
+vte_admission5  byte    %8.0g                 5 vte_admission
+population5     int     %8.0g                 5 population
+value5          float   %9.0g                 5 value
+rate5           float   %9.0g                 5 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_vte_admission_imd.svg not found)
+(file ./output/graphs/line_vte_admission_imd.svg written in SVG format)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_vte_admission_diff_imd.svg not found)
+(file ./output/graphs/line_vte_admission_diff_imd.svg written in SVG format)
+file ./output/graphs/line_data_vte_admission_diff_imd.csv saved
+(5 vars, 322 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1 2 3 4 5)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                      276   ->      46
+Number of variables                   6   ->      25
+j variable (6 values)               imd   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1 ... value5
+                                   rate   ->   rate0 rate1 ... rate5
+                             population   ->   population0 population1 ... popu
+> lation5
+                           mh_admission   ->   mh_admission0 mh_admission1 ... 
+> mh_admission5
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:            25                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+mh_admission0   byte    %8.0g                 0 mh_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+mh_admission1   byte    %8.0g                 1 mh_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+mh_admission2   byte    %8.0g                 2 mh_admission
+population2     int     %8.0g                 2 population
+value2          float   %9.0g                 2 value
+rate2           float   %9.0g                 2 rate
+mh_admission3   byte    %8.0g                 3 mh_admission
+population3     int     %8.0g                 3 population
+value3          float   %9.0g                 3 value
+rate3           float   %9.0g                 3 rate
+mh_admission4   byte    %8.0g                 4 mh_admission
+population4     int     %8.0g                 4 population
+value4          float   %9.0g                 4 value
+rate4           float   %9.0g                 4 rate
+mh_admission5   byte    %8.0g                 5 mh_admission
+population5     int     %8.0g                 5 population
+value5          float   %9.0g                 5 value
+rate5           float   %9.0g                 5 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_mh_admission_imd.svg not found)
+(file ./output/graphs/line_mh_admission_imd.svg written in SVG format)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_mh_admission_diff_imd.svg not found)
+(file ./output/graphs/line_mh_admission_diff_imd.svg written in SVG format)
+file ./output/graphs/line_data_mh_admission_diff_imd.csv saved
+
+. 
+. foreach this_group in mi stroke heart_failure vte mh {
+  2. * Migration status
+.         import delimited using ./output/measures/joined/measure_`this_group'_
+> admission_migration_status_rate.csv, numericcols(4) clear
+  3.         * IMD shouldn't be missing 
+.         count if migration_status==.
+  4.         * drop missings (should only be in dummy data)
+.         drop if migration_status==.
+  5.         * Generate rate per 100,000
+.         gen rate = value*100000 
+  6.         * Format date
+.         gen dateA = date(date, "YMD")
+  7.         drop date
+  8.         format dateA %dD/M/Y
+  9.         * reshape dataset so columns with rates for each ethnicity 
+.         reshape wide value rate population `this_group'_admission, i(dateA) j
+> (migration_status)
+ 10.         describe
+ 11. 
+.         * Generate line graph
+.         graph twoway line rate0 rate1 date, tlabel(01Jan2018(120)31Dec2021, a
+> ngle(45) ///
+>         format(%dM-CY) labsize(small)) ytitle("Rate per 100,000") xtitle("Dat
+> e") ylabel(#5, labsize(small) ///
+>         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(s
+> mall) ///
+>         title("Ethnic categories", size(small))) graphregion(fcolor(white))
+ 12. 
+.         graph export ./output/graphs/line_`this_group'_admission_migration_st
+> atus.svg, as(svg) replace
+ 13. 
+.         * Plotting first derivative i.e. difference between current rate and 
+> previous months rate
+.         forvalues i=0/1 {
+ 14.             sort dateA
+ 15.             gen first_derivative`i' = rate`i' - rate`i'[_n-1]
+ 16.             }
+ 17.        
+.         * Plot this
+.         graph twoway line first_derivative0 first_derivative1 date, tlabel(01
+> Jan2018(120)31Dec2021, angle(45) ///
+>         format(%dM-CY) labsize(small)) ytitle("Difference per 100,000") xtitl
+> e("Date") ylabel(#5, labsize(small) ///
+>         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(s
+> mall) ///
+>         title("Ethnic categories", size(small))) graphregion(fcolor(white))
+ 18. 
+.         graph export ./output/graphs/line_`this_group'_admission_diff_migrati
+> on_status.svg, as(svg) replace
+ 19.         * Export data file for output checking 
+.         export delimited using ./output/graphs/line_data_`this_group'_admissi
+> on_diff_migration_status.csv
+ 20.     }
+(5 vars, 138 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                       92   ->      46
+Number of variables                   6   ->       9
+j variable (2 values)  migration_status   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1
+                                   rate   ->   rate0 rate1
+                             population   ->   population0 population1
+                           mi_admission   ->   mi_admission0 mi_admission1
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:             9                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+mi_admission0   byte    %8.0g                 0 mi_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+mi_admission1   byte    %8.0g                 1 mi_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_mi_admission_migration_status.svg not found)
+(file ./output/graphs/line_mi_admission_migration_status.svg written in SVG for
+> mat)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_mi_admission_diff_migration_status.svg not fou
+> nd)
+(file ./output/graphs/line_mi_admission_diff_migration_status.svg written in SV
+> G format)
+file ./output/graphs/line_data_mi_admission_diff_migration_status.csv saved
+(5 vars, 138 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                       92   ->      46
+Number of variables                   6   ->       9
+j variable (2 values)  migration_status   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1
+                                   rate   ->   rate0 rate1
+                             population   ->   population0 population1
+                       stroke_admission   ->   stroke_admission0 stroke_admissi
+> on1
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:             9                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+stroke_admiss~0 byte    %8.0g                 0 stroke_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+stroke_admiss~1 byte    %8.0g                 1 stroke_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_stroke_admission_migration_status.svg not foun
+> d)
+(file ./output/graphs/line_stroke_admission_migration_status.svg written in SVG
+>  format)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_stroke_admission_diff_migration_status.svg not
+>  found)
+(file ./output/graphs/line_stroke_admission_diff_migration_status.svg written i
+> n SVG format)
+file ./output/graphs/line_data_stroke_admission_diff_migration_status.csv saved
+(5 vars, 138 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                       92   ->      46
+Number of variables                   6   ->       9
+j variable (2 values)  migration_status   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1
+                                   rate   ->   rate0 rate1
+                             population   ->   population0 population1
+                heart_failure_admission   ->   heart_failure_admission0 heart_f
+> ailure_admission1
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:             9                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+heart_failure~0 byte    %8.0g                 0 heart_failure_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+heart_failure~1 byte    %8.0g                 1 heart_failure_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_heart_failure_admission_migration_status.svg n
+> ot found)
+(file ./output/graphs/line_heart_failure_admission_migration_status.svg written
+>  in SVG format)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_heart_failure_admission_diff_migration_status.
+> svg not found)
+(file ./output/graphs/line_heart_failure_admission_diff_migration_status.svg wr
+> itten in SVG format)
+file ./output/graphs/line_data_heart_failure_admission_diff_migration_status.cs
+> v saved
+(5 vars, 138 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                       92   ->      46
+Number of variables                   6   ->       9
+j variable (2 values)  migration_status   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1
+                                   rate   ->   rate0 rate1
+                             population   ->   population0 population1
+                          vte_admission   ->   vte_admission0 vte_admission1
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:             9                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+vte_admission0  byte    %8.0g                 0 vte_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+vte_admission1  byte    %8.0g                 1 vte_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_vte_admission_migration_status.svg not found)
+(file ./output/graphs/line_vte_admission_migration_status.svg written in SVG fo
+> rmat)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_vte_admission_diff_migration_status.svg not fo
+> und)
+(file ./output/graphs/line_vte_admission_diff_migration_status.svg written in S
+> VG format)
+file ./output/graphs/line_data_vte_admission_diff_migration_status.csv saved
+(5 vars, 138 obs)
+  46
+(46 observations deleted)
+(note: j = 0 1)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                       92   ->      46
+Number of variables                   6   ->       9
+j variable (2 values)  migration_status   ->   (dropped)
+xij variables:
+                                  value   ->   value0 value1
+                                   rate   ->   rate0 rate1
+                             population   ->   population0 population1
+                           mh_admission   ->   mh_admission0 mh_admission1
+-----------------------------------------------------------------------------
+
+Contains data
+  obs:            46                          
+ vars:             9                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+mh_admission0   byte    %8.0g                 0 mh_admission
+population0     int     %8.0g                 0 population
+value0          float   %9.0g                 0 value
+rate0           float   %9.0g                 0 rate
+mh_admission1   byte    %8.0g                 1 mh_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+rate1           float   %9.0g                 1 rate
+-------------------------------------------------------------------------------
+Sorted by: dateA
+(note: file ./output/graphs/line_mh_admission_migration_status.svg not found)
+(file ./output/graphs/line_mh_admission_migration_status.svg written in SVG for
+> mat)
+(1 missing value generated)
+(1 missing value generated)
+(note: file ./output/graphs/line_mh_admission_diff_migration_status.svg not fou
+> nd)
+(file ./output/graphs/line_mh_admission_diff_migration_status.svg written in SV
+> G format)
+file ./output/graphs/line_data_mh_admission_diff_migration_status.csv saved
+
+. 
+end of do-file
+
+. . file open output using "/tmp/102_graphs.do.5saF.out", write text replace
+
+. . file write output "success" 
+
+. . file close output
+
+. 
+end of do-file
+
+

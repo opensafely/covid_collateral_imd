@@ -64,10 +64,8 @@ forvalues i=1/11 {
         graph export ./output/graphs/line_`this_outcome'_diff_imd.svg, as(svg) replace
         * Export data file for output checking 
         export delimited using ./output/graphs/line_data_`this_outcome'_diff_imd.csv
-    }
-
-foreach this_outcome in mi_admission stroke_admission heart_failure_admission vte_admission mh_admission dm_t1 dm_t2 dm_keto resp_asthma_exacerbation resp_copd_exacerbation resp_copd_exac_nolrti {
-* Migration status
+    
+        * Migration status
         import delimited using ./output/measures/joined/measure_`this_outcome'_migration_status_rate.csv, numericcols(4) clear
         * migration status shouldn't be missing 
         count if migration_status==.

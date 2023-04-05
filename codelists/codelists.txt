@@ -38,4 +38,4 @@ opensafely/lower-respiratory-tract-infection-secondary-care/21c94e19
     user/hjforbes/suicide-icd-10/3b53a18e
 
 # Migration status
-user/ruthcostello/migration_status/00a22669
+user/ruthcostello/migration-status-codes/38e3d751

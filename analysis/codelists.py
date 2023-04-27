@@ -108,3 +108,9 @@ suicide_icd_codes = codelist_from_csv(
     system="icd10",
     column="code",
 )
+
+migration_codes = codelist_from_csv(
+    "codelists/user-ruthcostello-migration-status-codes.csv",
+    system="snomed",
+    column="code",
+)

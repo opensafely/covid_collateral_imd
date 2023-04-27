@@ -57,7 +57,7 @@ forvalues i=1/11 {
         label var first_derivative5 "IMD 5"
         * Plot this
         graph twoway line first_derivative1 first_derivative2 first_derivative3 first_derivative4 first_derivative5 date, tlabel(01Jan2018(120)31Dec2021, angle(45) ///
-        format(%dM-CY) labsize(small)) ytitle("Difference (%)") xtitle("Date") ylabel(#5, labsize(small) ///
+        format(%dM-CY) labsize(small)) ytitle("Absolute difference") xtitle("Date") ylabel(#5, labsize(small) ///
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
         title("Ethnic categories", size(small))) graphregion(fcolor(white))
 

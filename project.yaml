@@ -113,3 +113,10 @@ actions:
         log: logs/graphs.log
         output: output/graphs/line_*.svg
         data: output/graphs/line_*.csv
+
+  check:
+    run: stata-mp:latest analysis/data_check.do
+    needs: [generate_study_population_dm, join_cohorts_dm]
+    outputs:
+      moderately_sensitive:
+        log: logs/check.log

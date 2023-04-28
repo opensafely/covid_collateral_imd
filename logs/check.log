@@ -1,0 +1,82 @@
+
+. 
+. * Checking join: Count number of patients in DM study definition 
+. 
+. import delimited using ./output/measures/input_dm_2018-03-01.csv, clear
+(10 vars, 1,000 obs)
+
+. 
+. safetab diabetes_subgroup
+0
+
+diabetes_su |
+     bgroup |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        950       95.00       95.00
+          1 |         50        5.00      100.00
+------------+-----------------------------------
+      Total |      1,000      100.00
+
+. 
+. import delimited using ./output/measures/joined/input_dm_2018-03-01.csv, clea
+> r
+(16 vars, 1,000 obs)
+
+. 
+. safetab diabetes_subgroup
+0
+
+diabetes_su |
+     bgroup |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        950       95.00       95.00
+          1 |         50        5.00      100.00
+------------+-----------------------------------
+      Total |      1,000      100.00
+
+. 
+. import delimited using ./output/measures/input_dm_2020-06-01.csv, clear
+(10 vars, 1,000 obs)
+
+. 
+. safetab diabetes_subgroup
+0
+
+diabetes_su |
+     bgroup |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        950       95.00       95.00
+          1 |         50        5.00      100.00
+------------+-----------------------------------
+      Total |      1,000      100.00
+
+. 
+. import delimited using ./output/measures/joined/input_dm_2020-06-01.csv, clea
+> r
+(16 vars, 1,000 obs)
+
+. 
+. safetab diabetes_subgroup
+0
+
+diabetes_su |
+     bgroup |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        950       95.00       95.00
+          1 |         50        5.00      100.00
+------------+-----------------------------------
+      Total |      1,000      100.00
+
+. 
+end of do-file
+
+. . file open output using "/tmp/data_check.do.ZiQU.out", write text replace
+
+. . file write output "success" 
+
+. . file close output
+
+. 
+end of do-file
+
+

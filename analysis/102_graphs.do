@@ -43,7 +43,7 @@ forvalues i=1/6 {
         graph twoway line percent1 percent2 percent3 percent4 percent5 date, tlabel(01Jan2018(120)31Dec2021, angle(45) ///
         format(%dM-CY) labsize(small)) ytitle("Percentage") xtitle("Date") ylabel(#5, labsize(small) ///
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
-        title("Ethnic categories", size(small))) graphregion(fcolor(white))
+        title("IMD categories", size(small))) graphregion(fcolor(white))
 
         graph export ./output/graphs/line_`this_outcome'_imd.svg, as(svg) replace
 
@@ -62,7 +62,7 @@ forvalues i=1/6 {
         graph twoway line first_derivative1 first_derivative2 first_derivative3 first_derivative4 first_derivative5 date, tlabel(01Jan2018(120)31Dec2021, angle(45) ///
         format(%dM-CY) labsize(small)) ytitle("Absolute difference") xtitle("Date") ylabel(#5, labsize(small) ///
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
-        title("Ethnic categories", size(small))) graphregion(fcolor(white))
+        title("IMD categories", size(small))) graphregion(fcolor(white))
 
         graph export ./output/graphs/line_`this_outcome'_diff_imd.svg, as(svg) replace
         * Export data file for output checking 
@@ -83,12 +83,15 @@ forvalues i=1/6 {
         * reshape dataset so columns with percentage for each migration category  
         reshape wide value percent `population' `this_outcome', i(dateA) j(migration_status)
         describe
+        
+        label var percent0 "Non-migrant"
+        label var percent1 "Migrant"
 
         * Generate line graph
         graph twoway line percent0 percent1 date, tlabel(01Jan2018(120)31Dec2021, angle(45) ///
-        format(%dM-CY) labsize(small)) ytitle("percent per 100,000") xtitle("Date") ylabel(#5, labsize(small) ///
+        format(%dM-CY) labsize(small)) ytitle("Percentage") xtitle("Date") ylabel(#5, labsize(small) ///
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
-        title("Ethnic categories", size(small))) graphregion(fcolor(white))
+        title("Migration status", size(small))) graphregion(fcolor(white))
 
         graph export ./output/graphs/line_`this_outcome'_migration_status.svg, as(svg) replace
 
@@ -97,12 +100,16 @@ forvalues i=1/6 {
             sort dateA
             gen first_derivative`j' = percent`j' - percent`j'[_n-1]
             }
-       
+
+         * Label variables 
+        label var first_derivative0 "Non-migrant"
+        label var first_derivative1 "Migrant"
+
         * Plot this
         graph twoway line first_derivative0 first_derivative1 date, tlabel(01Jan2018(120)31Dec2021, angle(45) ///
         format(%dM-CY) labsize(small)) ytitle("Difference (%)") xtitle("Date") ylabel(#5, labsize(small) ///
         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
-        title("Ethnic categories", size(small))) graphregion(fcolor(white))
+        title("Migration status", size(small))) graphregion(fcolor(white))
 
         graph export ./output/graphs/line_`this_outcome'_diff_migration_status.svg, as(svg) replace
         * Export data file for output checking 

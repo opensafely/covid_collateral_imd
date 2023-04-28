@@ -104,9 +104,10 @@ actions:
         log: logs/table1_descriptives.log
         output: output/tables/baseline_table_*.csv
 
+# will need to add calculate_measures back to needs once able to access level 2 data again.
   graphs:
     run: stata-mp:latest analysis/102_graphs.do
-    needs: [calculate_measures, calculate_measures_dm, calculate_measures_resp]
+    needs: [calculate_measures_dm, calculate_measures_resp]
     outputs:
       moderately_sensitive:
         log: logs/graphs.log

@@ -8,9 +8,12 @@ Description:    Generates line graphs of percentage of each outcome and strata p
 cap log using ./logs/graphs.log, replace
 cap mkdir ./output/graphs
 
-local outcomes "mi_admission stroke_admission heart_failure_admission vte_admission mh_admission dmt1_admission dmt2_admission dm_keto_admission resp_asthma_exac resp_copd_exac resp_copd_exac_nolrti"
-local file "population population population population population has_t1_diabetes has_t2_diabetes population has_asthma has_copd has_copd"
-forvalues i=1/11 {
+* To add back in once data available: 
+* outcomes local: mi_admission stroke_admission heart_failure_admission vte_admission mh_admission
+* file local: population population population population population
+local outcomes "dmt1_admission dmt2_admission dm_keto_admission resp_asthma_exac resp_copd_exac resp_copd_exac_nolrti"
+local file "has_t1_diabetes has_t2_diabetes population has_asthma has_copd has_copd"
+forvalues i=1/6 {
     local this_outcome: word `i' of `outcomes'
     local population: word `i' of `file'
 * Generates graphs for each outcome

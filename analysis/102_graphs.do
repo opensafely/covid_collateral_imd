@@ -20,9 +20,9 @@ forvalues i=1/6 {
 * IMD
         import delimited using ./output/measures/joined/measure_`this_outcome'_imd_rate.csv, numericcols(4) clear
         * IMD shouldn't be missing 
-        count if imd==0
+        count if imd==0 | imd==.
         * drop missings (should only be in dummy data)
-        drop if imd==0
+        drop if imd==0 | imd==.
         * Generate percentage of population with outcome
         gen percent = value*100
         * Format date

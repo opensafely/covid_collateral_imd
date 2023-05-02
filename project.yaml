@@ -61,11 +61,11 @@ actions:
         cohort: output/measures/joined/input_dm_*.csv
 
   calculate_measures_dm:
-    run: cohortextractor:latest  generate_measures --study-definition study_definition_dm --output-dir=output/measures/joined
-    needs: [join_cohorts_dm]
+    run: cohortextractor:latest  generate_measures --study-definition study_definition_dm --output-dir=output/measures
+    needs: [generate_study_population_dm]
     outputs:
       moderately_sensitive:
-        measure: output/measures/joined/measure_dm*_rate.csv
+        measure: output/measures/measure_dm*_rate.csv
 
 # Respiratory subpopulation
   generate_study_population_resp:

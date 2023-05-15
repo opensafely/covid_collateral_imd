@@ -26,7 +26,7 @@ cap mkdir ./output/tables
 * Create  baseline tables for 3 years
 forvalues i=2019/2021 {
   * Import csv file
-    import delimited ./output/measures/joined/input_`i'-01-01.csv, clear
+    import delimited ./output/measures/input_`i'-01-01.csv, clear
     *update variable with missing so that 0 is shown as unknown (just for this table)
     *(1) IMD
     replace imd=6 if imd==0

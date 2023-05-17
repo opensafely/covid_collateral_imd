@@ -18,7 +18,7 @@ forvalues i=1/6 {
     local population: word `i' of `file'
 * Generates graphs for each outcome
 * IMD
-        import delimited using ./output/measures/joined/measure_`this_outcome'_imd_rate.csv, numericcols(4) clear
+        import delimited using ./output/measures/measure_`this_outcome'_imd_rate.csv, numericcols(4) clear
         * IMD shouldn't be missing 
         count if imd==0 | imd==.
         * drop missings (should only be in dummy data)
@@ -69,7 +69,7 @@ forvalues i=1/6 {
         export delimited using ./output/graphs/line_data_`this_outcome'_diff_imd.csv
     
         * Migration status
-        import delimited using ./output/measures/joined/measure_`this_outcome'_migration_status_rate.csv, numericcols(4) clear
+        import delimited using ./output/measures/measure_`this_outcome'_migration_status_rate.csv, numericcols(4) clear
         * migration status shouldn't be missing 
         count if migration_status==.
         * drop missings (should only be in dummy data)

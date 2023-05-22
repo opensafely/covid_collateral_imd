@@ -11,12 +11,30 @@ study = StudyDefinition(
         "rate": "uniform",
         "incidence": 0.05,
     },
-    index_date="2018-03-01",
-    population=patients.all(),
-
+    index_date="2019-03-01",
+    population=patients.satisfying(
+        """
+        has_follow_up AND
+        (age >=18 AND age <= 110) AND
+        (NOT died) AND
+        (sex = 'M' OR sex = 'F') AND
+        (imd != 0) AND
+        (household>=1 AND household<=15)
+        """,
+        has_follow_up=patients.registered_with_one_practice_between(
+            "index_date - 3 months", "index_date"
+        ),
+        died=patients.died_from_any_cause(
+            on_or_before="index_date"
+        ),
+        household=patients.household_as_of(
+            "2020-02-01",
+            returning="household_size",
+        ),
+    ),
     # Age
     age=patients.age_as_of(
-        "2018-03-01",
+        "index_date",
         return_expectations={
             "rate": "universal",
             "int": {"distribution": "population_ages"},
@@ -94,5 +112,47 @@ study = StudyDefinition(
         on_or_before="index_date",
         returning="binary_flag",
         return_expectations={"incidence":0.2,},
+    ),
+
+    # Subgroups
+    has_t1_diabetes=patients.with_these_clinical_events(
+        t1dm_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence":0.2,}
+        ),
+    has_t2_diabetes=patients.with_these_clinical_events(
+        t2dm_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence":0.8,}
+        ),
+    diabetes_subgroup=patients.satisfying(
+        """
+        has_t1_diabetes OR 
+        has_t2_diabetes
+        """,
+    ),
+    has_asthma=patients.with_these_clinical_events(
+        asthma_codes,
+        between=["index_date - 3 years", "index_date"],
+        returning="binary_flag",
+        return_expectations={"incidence":0.2,}
+        ),
+    has_copd=patients.satisfying(
+    """has_copd_code AND age40>40""",
+        has_copd_code=patients.with_these_clinical_events(
+        copd_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={"incidence":0.8,}
+        ),
+        age40=patients.age_as_of(
+            "index_date",
+            return_expectations={
+                "rate": "universal",
+                "int": {"distribution": "population_ages"},
+            },
+        ),
     ),
 )

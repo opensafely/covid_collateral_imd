@@ -118,7 +118,7 @@ actions:
 
   graphs:
     run: stata-mp:latest analysis/102_graphs.do
-    needs: [calculate_measures, calculate_measures_dm, calculate_measures_resp]
+    needs: [calculate_measures]
     outputs:
       moderately_sensitive:
         log: logs/graphs.log

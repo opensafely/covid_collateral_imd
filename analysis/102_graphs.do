@@ -8,14 +8,13 @@ Description:    Generates line graphs of percentage of each outcome and strata p
 cap log using ./logs/graphs.log, replace
 cap mkdir ./output/graphs
 
-* To add back in once data available: 
-* outcomes local: mi_admission stroke_admission heart_failure_admission vte_admission mh_admission
-* file local: population population population population population
-local outcomes "dmt1_admission dmt2_admission dm_keto_admission resp_asthma_exac resp_copd_exac resp_copd_exac_nolrti"
-local file "has_t1_diabetes has_t2_diabetes population has_asthma has_copd has_copd"
-forvalues i=1/6 {
+* CVD outcomes only
+* file local:  population
+local outcomes "mi_admission stroke_admission heart_failure_admission vte_admission"
+*local file "has_t1_diabetes has_t2_diabetes population has_asthma has_copd has_copd"
+forvalues i=1/4 {
     local this_outcome: word `i' of `outcomes'
-    local population: word `i' of `file'
+    *local population: word `i' of `file'
 * Generates graphs for each outcome
 * IMD
         import delimited using ./output/measures/measure_`this_outcome'_imd_rate.csv, numericcols(4) clear
@@ -30,7 +29,7 @@ forvalues i=1/6 {
         drop date
         format dateA %dD/M/Y
         * reshape dataset so columns with percentage for each IMD category 
-        reshape wide value percent `population' `this_outcome', i(dateA) j(imd)
+        reshape wide value percent population `this_outcome', i(dateA) j(imd)
         describe
         * Labelling IMD variables
         label var percent1 "IMD 1"
@@ -68,7 +67,7 @@ forvalues i=1/6 {
         * Export data file for output checking 
         export delimited using ./output/graphs/line_data_`this_outcome'_diff_imd.csv
     
-        * Migration status
+        /* Migration status
         import delimited using ./output/measures/measure_`this_outcome'_migration_status_rate.csv, numericcols(4) clear
         * migration status shouldn't be missing 
         count if migration_status==.
@@ -114,5 +113,6 @@ forvalues i=1/6 {
         graph export ./output/graphs/line_`this_outcome'_diff_migration_status.svg, as(svg) replace
         * Export data file for output checking 
         export delimited using ./output/graphs/line_data_`this_outcome'_diff_migration_status.csv
+        */
     }
 

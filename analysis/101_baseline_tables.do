@@ -52,7 +52,7 @@ forvalues i=2019/2021 {
     has_t1_diabetes cat  \ has_t2_diabetes cat \ has_asthma cat \ has_copd cat ) clear
     export delimited using ./output/tables/baseline_table_`i'.csv
     * Rounding numbers in table to nearest 5
-    destring _columna_1, gen(n) force
+    destring _columna_1, gen(n) ignore(",") force
     destring _columnb_1, gen(percent) ignore("-" "%" "(" ")")  force
     gen rounded_n = round(n, 5)
     keep factor level rounded_n percent
@@ -63,8 +63,8 @@ forvalues i=2019/2021 {
     table1_mc, vars(age_cat cat \ sex cat \ imd cat \ urban_rural_bin cat  \  ///
     has_t1_diabetes cat  \ has_t2_diabetes cat \ has_asthma cat \ has_copd cat ) by(migration_status) clear
     export delimited using ./output/tables/baseline_table_migration_`i'.csv
-    destring _columna_1, gen(n1) force
-    destring _columna_0, gen(n0) force
+    destring _columna_1, gen(n1) ignore(",") force
+    destring _columna_0, gen(n0) ignore(",") force
     destring _columnb_1, gen(percent1) ignore("-" "%" "(" ")")  force
     destring _columnb_0, gen(percent0) ignore("-" "%" "(" ")")  force
     gen rounded_n1 = round(n1, 5)
@@ -79,29 +79,28 @@ forvalues i=2019/2021 {
     gen imd_4 = (imd==4)
     gen imd_5 = (imd==5)
 
-    tempfile tempfile
     preserve
-    keep if imd==1
-    table1_mc, vars(age_cat cat \ sex cat \ imd cat \ urban_rural_bin cat  \  ///
-    has_t1_diabetes cat  \ has_t2_diabetes cat \ has_asthma cat \ has_copd cat) clear
-    save `tempfile', replace
-    restore
-    forvalues j=2/5 {
-      preserve
-      keep if imd==`j'
-      table1_mc, vars(age_cat cat \ sex cat \ imd cat \ urban_rural_bin cat  \  ///
-      has_t1_diabetes cat  \ has_t2_diabetes cat \ has_asthma cat \ has_copd cat) clear
-      append using `tempfile'
-      save `tempfile', replace
-      restore
-      }
-    use `tempfile', clear
+    table1_mc, vars(age_cat cat \ sex cat \ urban_rural_bin cat  \  ///
+    has_t1_diabetes cat  \ has_t2_diabetes cat \ has_asthma cat \ has_copd cat) by(imd) clear
     export delimited using ./output/tables/baseline_table_imd`i'.csv
-    destring _columna_1, gen(n) force
-    destring _columnb_1, gen(percent) ignore("-" "%" "(" ")") force
-    gen rounded_n = round(n, 5)
-    keep factor level rounded_n percent
+    destring _columna_1, gen(n1) ignore(",") force
+    destring _columnb_1, gen(percent1) ignore("-" "%" "(" ")") force
+    destring _columna_2, gen(n2) ignore(",") force
+    destring _columnb_2, gen(percent2) ignore("-" "%" "(" ")") force
+    destring _columna_3, gen(n3) ignore(",") force
+    destring _columnb_3, gen(percent3) ignore("-" "%" "(" ")") force
+    destring _columna_4, gen(n4) ignore(",") force
+    destring _columnb_4, gen(percent4) ignore("-" "%" "(" ")") force
+    destring _columna_5, gen(n5) ignore(",") force
+    destring _columnb_5, gen(percent5) ignore("-" "%" "(" ")") force
+    gen rounded_n1 = round(n1, 5)
+    gen rounded_n2 = round(n2, 5)
+    gen rounded_n3 = round(n3, 5)
+    gen rounded_n4 = round(n4, 5)
+    gen rounded_n5 = round(n5, 5)
+    keep factor level rounded_n1 percent1 rounded_n2 percent2 rounded_n3 percent3 rounded_n4 percent4 rounded_n5 percent5
     export delimited using ./output/tables/baseline_table_imd`i'_rounded.csv
+    restore
     }
 
 * Close log file 

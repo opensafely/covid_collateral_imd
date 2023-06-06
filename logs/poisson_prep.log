@@ -1,0 +1,65 @@
+
+. cap mkdir ./output/cvd
+
+. 
+. * outcomes local: 
+. * file local: 
+. local outcomes "mi_admission stroke_admission heart_failure_admission vte_adm
+> ission"
+
+. forvalues i=1/4 {
+  2.     local this_outcome: word `i' of `outcomes'
+  3.     import delimited using ./output/measures/measure_`this_outcome'_imd_ra
+> te.csv, numericcols(4) clear
+  4.     * IMD shouldn't be missing 
+.     count if imd==0 | imd==.
+  5.     * drop missings (should only be in dummy data)
+.     drop if imd==0 | imd==.
+  6.     * Format date
+.     gen dateA = date(date, "YMD")
+  7.     drop date
+  8.     format dateA %dD/M/Y
+  9.     * Generate indicator if month is during pandemic
+.     gen postcovid=(dateA>=date("23/03/2020", "DMY"))
+ 10.     sort imd date
+ 11.     gen time_1 = _n if imd==1
+ 12.     bys date (imd): egen time = max(time_1)
+ 13.     drop time_1
+ 14.     rename `this_outcome' numOutcome
+ 15.     export delimited using ./output/cvd/an_`this_outcome'.csv
+ 16. }
+(5 vars, 276 obs)
+  46
+(46 observations deleted)
+(184 missing values generated)
+file ./output/cvd/an_mi_admission.csv saved
+(5 vars, 276 obs)
+  46
+(46 observations deleted)
+(184 missing values generated)
+file ./output/cvd/an_stroke_admission.csv saved
+(5 vars, 276 obs)
+  46
+(46 observations deleted)
+(184 missing values generated)
+file ./output/cvd/an_heart_failure_admission.csv saved
+(5 vars, 276 obs)
+  46
+(46 observations deleted)
+(184 missing values generated)
+file ./output/cvd/an_vte_admission.csv saved
+
+. 
+end of do-file
+
+. . file open output using "/tmp/103_poisson_prep.do.TtA9.out", write text repl
+> ace
+
+. . file write output "success" 
+
+. . file close output
+
+. 
+end of do-file
+
+

@@ -106,3 +106,5 @@ actions:
     outputs:
       moderately_sensitive:
         output: output/table3.csv
+        model_outpus: output/poisson_model_output.txt
+        model_plot: output/poisson_modelfits.pdf

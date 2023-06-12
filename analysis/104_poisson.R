@@ -180,12 +180,12 @@ write.csv(tab3, file = here::here("./output/table3.csv"), row.names = F)
 
 
 # combine plots  ----------------------------------------------------------
-pdf(here::here("output/poisson_modelfits.pdf"), width = 10, height = 6)
+pdf(here::here("output/poisson_modelfits.pdf"), width = 11, height = 6)
 cowplot::plot_grid(
   model_outputs[[1]][[2]], 
   model_outputs[[2]][[2]], 
   model_outputs[[3]][[2]], 
   model_outputs[[4]][[2]],
-  nrow = 1, ncol = 4, hjust = 0.2, label_size = 11,
+  nrow = 1, ncol = 4, hjust = -0.2, label_size = 11,
   labels = c("Heart failure", "Myocardial infarction", "Stroke", "VTE"))
 dev.off()

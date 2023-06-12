@@ -13,6 +13,7 @@ library(stringr)
 library(ggplot2)
 library(patchwork)
 library(lubridate)
+library(cowplot)
 bkg_colour <- "gray99"
 
 here::here()
@@ -41,36 +42,39 @@ tab3_function <- function(outcome){
   # Taken out code for creating variables as I have done this in Stata
   ## model Poisson 
   po_model1 <- glm(numOutcome ~ offset(log(population)) + postcovid + imd + time + imd:postcovid, family=quasipoisson, data = df_outcome)
-  # get lagged residuals
-  lagres1 <- lag(residuals(po_model1))
   
-  ## full model with lagged residuals
-  po_model2 <- glm(numOutcome ~ offset(log(population)) + postcovid + time + imd + imd:postcovid  + lagres1, family=quasipoisson, data = df_outcome)
+  ## Capture output
+  capture.output(
+    cat(outcome, rep("-", 20), "\n"), 
+    broom::tidy(po_model1, exp = TRUE),
+    cat("\n"),
+    file = here::here("output/poisson_model_output.txt"),
+    append = TRUE
+  )
   
   ## adjust predicted values
-  pearson_gof <- sum(residuals(po_model2, type = "pearson")^2)
-  df <- po_model2$df.residual
+  pearson_gof <- sum(residuals(po_model1, type = "pearson")^2)
+  df <- po_model1$df.residual
   deviance_adjustment <- pearson_gof/df
-  po_lagres_timing <- bind_cols("time" = df_outcome$time,
-                                "lagres1" = lagres1, "imd" = df_outcome$imd)
   
   ## data frame to predict values from 
-  outcome_pred <- df_outcome %>%
-    left_join(po_lagres_timing, by = c("imd" = "imd", "time" = "time"))
+  outcome_pred <- df_outcome
   
   ## predict values
-  pred1 <- predict(po_model2, newdata = outcome_pred, se.fit = TRUE, interval="confidence", dispersion = deviance_adjustment)
+  pred1 <- predict(po_model1, newdata = outcome_pred, se.fit = TRUE, interval="confidence", dispersion = deviance_adjustment, type = "link")
+  # predicted number of admissions per person, for each combination of outcome_pred (by lockdown, IMD, time, pre_post_covid, and lagres): all still on log scale
   predicted_vals <- pred1$fit
   stbp <- pred1$se.fit
   
   ## predict values if no lockdown 
   outcome_pred_nointervention <- outcome_pred %>%
     mutate_at("postcovid", ~(.=0)) 
-  predicted_vals_nointervention <- predict(po_model2, newdata = outcome_pred_nointervention, se.fit = TRUE, dispersion = deviance_adjustment) 
+  predicted_vals_nointervention <- predict(po_model1, newdata = outcome_pred_nointervention, se.fit = TRUE, dispersion = deviance_adjustment, type = "link") 
   predicted_vals_noLdn <- predicted_vals_nointervention$fit	
   stbp_noLdn <- predicted_vals_nointervention$se.fit	
   
-  ## standard errors
+  ## standard errors to get confidence estimates. 
+  ## then exponentiate to get onto the predicted values scale
   df_se <- bind_cols(imd = as.character(df_outcome$imd), 
                      stbp = stbp,
                      pred = predicted_vals, 
@@ -79,15 +83,16 @@ tab3_function <- function(outcome){
                      denom = df_outcome$population) %>%
     mutate(
       #CIs
-      upp = pred + (1.96*stbp),
-      low = pred - (1.96*stbp),
-      upp_noLdn = pred_noLdn + (1.96*stbp_noLdn),
-      low_noLdn = pred_noLdn - (1.96*stbp_noLdn),
+      upp = exp(pred + (1.96*stbp)),
+      low = exp(pred - (1.96*stbp)),
+      upp_noLdn = exp(pred_noLdn + (1.96*stbp_noLdn)),
+      low_noLdn = exp(pred_noLdn - (1.96*stbp_noLdn)),
+      pred = exp(pred),
+      pred_noLdn = exp(pred_noLdn)
     )
   sigdig <- 2
-  model_out <- signif(ci.exp(po_model2)[2,], sigdig)
   
-  # bind predictions with dates and set a pre/post-lockdwon variable
+  # bind predictions with dates and set a pre/post-lockdown variable
   tab3_merge <- bind_cols("weekPlot" = df_outcome$date, 
                           "postcovid" = df_outcome$postcovid,
                           df_se)
@@ -95,9 +100,10 @@ tab3_function <- function(outcome){
   # how many post-lockdown months of data are there? 
   months_post <- (table(tab3_merge$postcovid)/5)[2]
   months_pre <- (table(tab3_merge$postcovid)/5)[1]
+  rows_to_remove <- (months_pre-months_post)*5
   # create a variable to filter all of the post-lockdown and the relevant period pre lockdown
   tab3_merge$select <- 1
-  tab3_merge$select[1:(months_pre-months_post)] <- 0
+  tab3_merge$select[1:rows_to_remove] <- 0
   
   tab3_cumsum <- tab3_merge %>% 
     filter(select == 1) %>% 
@@ -132,14 +138,51 @@ tab3_function <- function(outcome){
     # drop the cumsum_with_lockdown_pre: it is identical to cumsum_no_lockdown_post and it makes no sense to predict a lockdown pre covid
     dplyr::select(-cumsum_with_lockdown_pre) 
   
-  return(tab3_fmt)
+  df_plot <- df_outcome %>% 
+    dplyr::select(dateA, imd, numOutcome) %>% 
+    mutate(imd = as.character(imd)) %>% 
+    left_join(tab3_merge, by = c("dateA"="weekPlot", "imd" = "imd")) %>% 
+    filter(select == 1)
+  
+  plot_modelfit <- ggplot(df_plot, aes(x=dateA, y=numOutcome, group=imd, colour=imd, fill=imd)) +
+    geom_line() +
+    geom_ribbon(aes(ymin=low, ymax = upp), lty = 0, alpha = 0.4) +
+    geom_ribbon(data = filter(df_plot, postcovid == 1), aes(ymin=low_noLdn, ymax = upp_noLdn), fill = "gray20", lty = 0, alpha = 0.4) +
+    geom_vline(xintercept = start_lockdown, lty = 2, col = "gray40") +
+    labs(colour = "IMD",
+         fill = "IMD",
+         x = "Month", 
+         y = "Admissions") +
+    facet_wrap(~imd, ncol = 1) +
+    theme_bw() +
+    theme(strip.background = element_blank(),
+          legend.position = "none")
+  
+  if(outcome != "heart_failure_admission"){
+    plot_modelfit <- plot_modelfit + 
+      theme(axis.title.y = element_blank())
+  }
+  return(list(tab3_fmt, plot_modelfit))
 }
+
+model_outputs <- lapply(outcomes[plot_order], function(xx){tab3_function(xx)})
 
 tab3 <- NULL
 for(ii in plot_order){
   tab3 <- bind_rows(tab3,
-                    tab3_function(outcomes[ii]))
+                    model_outputs[[ii]][[1]])
   tab3[nrow(tab3) + 1,] <- ""
 }
 
 write.csv(tab3, file = here::here("./output/table3.csv"), row.names = F)
+
+
+# combine plots  ----------------------------------------------------------
+pdf(here::here("output/poisson_modelfits.pdf"), width = 10, height = 6)
+cowplot::plot_grid(
+  model_outputs[[1]][[2]], 
+  model_outputs[[2]][[2]], 
+  model_outputs[[3]][[2]], 
+  model_outputs[[4]][[2]],
+  nrow = 1, ncol = 4)
+dev.off()

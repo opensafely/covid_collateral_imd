@@ -142,7 +142,8 @@ tab3_function <- function(outcome){
     dplyr::select(dateA, imd, numOutcome) %>% 
     mutate(imd = as.character(imd)) %>% 
     left_join(tab3_merge, by = c("dateA"="weekPlot", "imd" = "imd")) %>% 
-    filter(select == 1)
+    filter(select == 1) %>% 
+    mutate(imd = factor(imd, labels = paste0("IMD: ", 1:5)))
   
   plot_modelfit <- ggplot(df_plot, aes(x=dateA, y=numOutcome, group=imd, colour=imd, fill=imd)) +
     geom_line() +
@@ -156,7 +157,8 @@ tab3_function <- function(outcome){
     facet_wrap(~imd, ncol = 1) +
     theme_bw() +
     theme(strip.background = element_blank(),
-          legend.position = "none")
+          legend.position = "none",
+          strip.text = element_text(hjust = 1))
   
   if(outcome != "heart_failure_admission"){
     plot_modelfit <- plot_modelfit + 
@@ -184,5 +186,6 @@ cowplot::plot_grid(
   model_outputs[[2]][[2]], 
   model_outputs[[3]][[2]], 
   model_outputs[[4]][[2]],
-  nrow = 1, ncol = 4)
+  nrow = 1, ncol = 4, hjust = 0.2, label_size = 11,
+  labels = c("Heart failure", "Myocardial infarction", "Stroke", "VTE"))
 dev.off()

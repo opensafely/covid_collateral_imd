@@ -4,12 +4,11 @@
 . 
 . * CVD outcomes only
 . * file local:  population
-. local outcomes "mi_admission stroke_admission heart_failure_admission vte_adm
-> ission"
+. local outcomes "mi_admission heart_failure_admission vte_admission"
 
 . *local file "has_t1_diabetes has_t2_diabetes population has_asthma has_copd h
 > as_copd"
-. forvalues i=1/4 {
+. forvalues i=1/3 {
   2.     local this_outcome: word `i' of `outcomes'
   3.     *local population: word `i' of `file'
 . * Generates graphs for each outcome
@@ -212,65 +211,6 @@ xij variables:
                                 percent   ->   percent1 percent2 ... percent5
                              population   ->   population1 population2 ... popu
 > lation5
-                       stroke_admission   ->   stroke_admission1 stroke_admissi
-> on2 ... stroke_admission5
------------------------------------------------------------------------------
-
-Contains data
-  obs:            46                          
- vars:            21                          
--------------------------------------------------------------------------------
-              storage   display    value
-variable name   type    format     label      variable label
--------------------------------------------------------------------------------
-dateA           float   %dD/M/Y               
-stroke_admiss~1 byte    %8.0g                 1 stroke_admission
-population1     int     %8.0g                 1 population
-value1          float   %9.0g                 1 value
-percent1        float   %9.0g                 1 percent
-stroke_admiss~2 byte    %8.0g                 2 stroke_admission
-population2     int     %8.0g                 2 population
-value2          float   %9.0g                 2 value
-percent2        float   %9.0g                 2 percent
-stroke_admiss~3 byte    %8.0g                 3 stroke_admission
-population3     int     %8.0g                 3 population
-value3          float   %9.0g                 3 value
-percent3        float   %9.0g                 3 percent
-stroke_admiss~4 byte    %8.0g                 4 stroke_admission
-population4     int     %8.0g                 4 population
-value4          float   %9.0g                 4 value
-percent4        float   %9.0g                 4 percent
-stroke_admiss~5 byte    %8.0g                 5 stroke_admission
-population5     int     %8.0g                 5 population
-value5          float   %9.0g                 5 value
-percent5        float   %9.0g                 5 percent
--------------------------------------------------------------------------------
-Sorted by: dateA
-(note: file ./output/graphs/line_stroke_admission_imd.svg not found)
-(file ./output/graphs/line_stroke_admission_imd.svg written in SVG format)
-(1 missing value generated)
-(1 missing value generated)
-(1 missing value generated)
-(1 missing value generated)
-(1 missing value generated)
-(note: file ./output/graphs/line_stroke_admission_diff_imd.svg not found)
-(file ./output/graphs/line_stroke_admission_diff_imd.svg written in SVG format)
-file ./output/graphs/line_data_stroke_admission_diff_imd.csv saved
-(5 vars, 276 obs)
-  46
-(46 observations deleted)
-(note: j = 1 2 3 4 5)
-
-Data                               long   ->   wide
------------------------------------------------------------------------------
-Number of obs.                      230   ->      46
-Number of variables                   6   ->      21
-j variable (5 values)               imd   ->   (dropped)
-xij variables:
-                                  value   ->   value1 value2 ... value5
-                                percent   ->   percent1 percent2 ... percent5
-                             population   ->   population1 population2 ... popu
-> lation5
                 heart_failure_admission   ->   heart_failure_admission1 heart_f
 > ailure_admission2 ... heart_failure_admission5
 -----------------------------------------------------------------------------
@@ -379,10 +319,157 @@ Sorted by: dateA
 file ./output/graphs/line_data_vte_admission_diff_imd.csv saved
 
 . 
+. * Stroke 
+. import delimited using ./output/measures/measure_stroke_admission_imd_rate.cs
+> v, numericcols(4) clear
+(5 vars, 276 obs)
+
+.         * IMD shouldn't be missing 
+.         count if imd==0 | imd==.
+  46
+
+.         * drop missings (should only be in dummy data)
+.         drop if imd==0 | imd==.
+(46 observations deleted)
+
+.         * Generate percentage of population with outcome
+.         gen percent = value*100
+
+.         * Format date
+.         gen dateA = date(date, "YMD")
+
+.         drop date
+
+.         format dateA %dD/M/Y
+
+.         * reshape dataset so columns with percentage for each IMD category 
+.         reshape wide value percent population stroke_admission, i(dateA) j(im
+> d)
+(note: j = 1 2 3 4 5)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                      230   ->      46
+Number of variables                   6   ->      21
+j variable (5 values)               imd   ->   (dropped)
+xij variables:
+                                  value   ->   value1 value2 ... value5
+                                percent   ->   percent1 percent2 ... percent5
+                             population   ->   population1 population2 ... popu
+> lation5
+                       stroke_admission   ->   stroke_admission1 stroke_admissi
+> on2 ... stroke_admission5
+-----------------------------------------------------------------------------
+
+.         describe
+
+Contains data
+  obs:            46                          
+ vars:            21                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+dateA           float   %dD/M/Y               
+stroke_admiss~1 byte    %8.0g                 1 stroke_admission
+population1     int     %8.0g                 1 population
+value1          float   %9.0g                 1 value
+percent1        float   %9.0g                 1 percent
+stroke_admiss~2 byte    %8.0g                 2 stroke_admission
+population2     int     %8.0g                 2 population
+value2          float   %9.0g                 2 value
+percent2        float   %9.0g                 2 percent
+stroke_admiss~3 byte    %8.0g                 3 stroke_admission
+population3     int     %8.0g                 3 population
+value3          float   %9.0g                 3 value
+percent3        float   %9.0g                 3 percent
+stroke_admiss~4 byte    %8.0g                 4 stroke_admission
+population4     int     %8.0g                 4 population
+value4          float   %9.0g                 4 value
+percent4        float   %9.0g                 4 percent
+stroke_admiss~5 byte    %8.0g                 5 stroke_admission
+population5     int     %8.0g                 5 population
+value5          float   %9.0g                 5 value
+percent5        float   %9.0g                 5 percent
+-------------------------------------------------------------------------------
+Sorted by: dateA
+
+.         * Labelling IMD variables
+.         label var percent1 "IMD 1"
+
+.         label var percent2 "IMD 2"
+
+.         label var percent3 "IMD 3"
+
+.         label var percent4 "IMD 4"
+
+.         label var percent5 "IMD 5"
+
+. 
+.         * Generate line graph
+.         graph twoway line percent1 percent2 percent3 percent4 percent5 date, 
+> tlabel(01Jan2018(120)31Dec2021, angle(45) ///
+>         format(%dM-CY) labsize(small)) ytitle("Percentage") xtitle("Date") yl
+> abel(0.1 (0.1)0.3, labsize(small) ///
+>         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(s
+> mall) ///
+>         title("IMD categories", size(small))) graphregion(fcolor(white))
+
+. 
+.         graph export ./output/graphs/line_stroke_admission_imd.svg, as(svg) r
+> eplace
+(note: file ./output/graphs/line_stroke_admission_imd.svg not found)
+(file ./output/graphs/line_stroke_admission_imd.svg written in SVG format)
+
+. 
+.         * Plotting first derivative i.e. difference between current percent a
+> nd previous months percent
+.         forvalues j=1/5 {
+  2.             sort dateA
+  3.             gen first_derivative`j' = percent`j' - percent`j'[_n-1]
+  4.             }
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+(1 missing value generated)
+
+.         * Label variables 
+.         label var first_derivative1 "IMD 1"
+
+.         label var first_derivative2 "IMD 2"
+
+.         label var first_derivative3 "IMD 3"
+
+.         label var first_derivative4 "IMD 4"
+
+.         label var first_derivative5 "IMD 5"
+
+.         * Plot this
+.         graph twoway line first_derivative1 first_derivative2 first_derivativ
+> e3 first_derivative4 first_derivative5 date, tlabel(01Jan2018(120)31Dec2021, 
+> angle(45) ///
+>         format(%dM-CY) labsize(small)) ytitle("Absolute difference") xtitle("
+> Date") ylabel(#5, labsize(small) ///
+>         angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(s
+> mall) ///
+>         title("IMD categories", size(small))) graphregion(fcolor(white))
+
+. 
+.         graph export ./output/graphs/line_stroke_admission_diff_imd.svg, as(s
+> vg) replace
+(note: file ./output/graphs/line_stroke_admission_diff_imd.svg not found)
+(file ./output/graphs/line_stroke_admission_diff_imd.svg written in SVG format)
+
+.         * Export data file for output checking 
+.         export delimited using ./output/graphs/line_data_stroke_admission_dif
+> f_imd.csv
+file ./output/graphs/line_data_stroke_admission_diff_imd.csv saved
+
 . 
 end of do-file
 
-. . file open output using "/tmp/102_graphs.do.i9YU.out", write text replace
+. . file open output using "/tmp/102_graphs.do.mtHE.out", write text replace
 
 . . file write output "success" 
 

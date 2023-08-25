@@ -19,19 +19,19 @@ actions:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_static --index-date-range "2018-03-01" --output-dir=output/measures/tables --output-format=csv
     outputs:
       highly_sensitive:
-        cohort: output/input_static_2019-01-01.csv
+        cohort: output/input_static_2019-03-01.csv
 
   generate_study_population_static_2020:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_static --index-date-range "2020-03-01" --output-dir=output/measures/tables --output-format=csv
     outputs:
       highly_sensitive:
-        cohort: output/input_static_2020-01-01.csv
+        cohort: output/input_static_2020-03-01.csv
   
   generate_study_population_static_2021:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_static --index-date-range "2021-03-01" --output-dir=output/measures/tables --output-format=csv
     outputs:
       highly_sensitive:
-        cohort: output/input_static_2021-01-01.csv
+        cohort: output/input_static_2021-03-01.csv
 
   calculate_measures:
     run: cohortextractor:latest  generate_measures --study-definition study_definition --output-dir=output/measures

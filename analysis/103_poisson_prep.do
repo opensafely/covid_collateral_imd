@@ -23,7 +23,7 @@ forvalues i=1/4 {
     drop date
     format dateA %dD/M/Y
     * Generate indicator if month is during pandemic
-    gen postcovid=(dateA>=date("23/03/2020", "DMY"))
+    gen postcovid=(dateA>=date("01/03/2020", "DMY"))
     sort imd date
     gen time_1 = _n if imd==1
     bys date (imd): egen time = max(time_1)

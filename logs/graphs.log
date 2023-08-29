@@ -6,35 +6,36 @@
 . local outcomes "mi_admission stroke_admission heart_failure_admission vte_adm
 > ission"
 
-. *local file "has_t1_diabetes has_t2_diabetes population has_asthma has_copd h
-> as_copd"
+. local titles "MI Stroke HF VTE"
+
 . forvalues i=1/4 {
   2.     local this_outcome: word `i' of `outcomes'
-  3.     
+  3.         local this_title: word `i' of `titles'
+  4.     
 .     * Generates graphs for each outcome
 .     * IMD
 .     import delimited using ./output/measures/measure_`this_outcome'_imd_rate.
 > csv, numericcols(4) clear
-  4.     * IMD shouldn't be missing 
+  5.     * IMD shouldn't be missing 
 .     count if imd==0 | imd==.
-  5.     * drop missings (should only be in dummy data)
+  6.     * drop missings (should only be in dummy data)
 .     drop if imd==0 | imd==.
-  6.     * Generate percentage of population with outcome
+  7.     * Generate percentage of population with outcome
 .     gen percent = value*100
-  7.     * Format date
+  8.     * Format date
 .     gen dateA = date(date, "YMD")
-  8.     drop date
-  9.     format dateA %dD/M/Y
- 10.     * reshape dataset so columns with percentage for each IMD category 
+  9.     drop date
+ 10.     format dateA %dD/M/Y
+ 11.     * reshape dataset so columns with percentage for each IMD category 
 .     reshape wide value percent population `this_outcome', i(dateA) j(imd)
- 11.     describe
- 12.     * Labelling IMD variables
+ 12.     describe
+ 13.     * Labelling IMD variables
 .     label var percent1 "IMD 1"
- 13.     label var percent2 "IMD 2"
- 14.     label var percent3 "IMD 3"
- 15.     label var percent4 "IMD 4"
- 16.     label var percent5 "IMD 5"
- 17. 
+ 14.     label var percent2 "IMD 2"
+ 15.     label var percent3 "IMD 3"
+ 16.     label var percent4 "IMD 4"
+ 17.     label var percent5 "IMD 5"
+ 18. 
 .     * Generate line graph
 .     graph twoway line percent1 percent2 percent3 percent4 percent5 date, tlab
 > el(01Mar2018(90)30Nov2021, angle(45) ///
@@ -42,23 +43,24 @@
 > (0(0.01)0.03, labsize(small) ///
 >     angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small
 > ) ///
->     title("IMD categories", size(small))) graphregion(fcolor(white))
- 18. 
-.     graph export ./output/graphs/line_`this_outcome'_imd.svg, as(svg) replace
+>     title("IMD categories", size(small))) graphregion(fcolor(white)) saving(`
+> this_outcome', replace) title(`this_title')
  19. 
+.     graph export ./output/graphs/line_`this_outcome'_imd.svg, as(svg) replace
+ 20. 
 .     * Plotting first derivative i.e. difference between current percent and p
 > revious months percent
 .     forvalues j=1/5 {
- 20.         sort dateA
- 21.         gen first_derivative`j' = percent`j' - percent`j'[_n-1]
- 22.         }
- 23.     * Label variables 
+ 21.         sort dateA
+ 22.         gen first_derivative`j' = percent`j' - percent`j'[_n-1]
+ 23.         }
+ 24.     * Label variables 
 .     label var first_derivative1 "IMD 1"
- 24.     label var first_derivative2 "IMD 2"
- 25.     label var first_derivative3 "IMD 3"
- 26.     label var first_derivative4 "IMD 4"
- 27.     label var first_derivative5 "IMD 5"
- 28.     * Plot this
+ 25.     label var first_derivative2 "IMD 2"
+ 26.     label var first_derivative3 "IMD 3"
+ 27.     label var first_derivative4 "IMD 4"
+ 28.     label var first_derivative5 "IMD 5"
+ 29.     * Plot this
 .     graph twoway line first_derivative1 first_derivative2 first_derivative3 f
 > irst_derivative4 first_derivative5 date, tlabel(01Mar2018(90)30Nov2021, angle
 > (45) ///
@@ -66,14 +68,15 @@
 > ") ylabel(-0.01(0.005)0.01, labsize(small) ///
 >     angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small
 > ) ///
->     title("IMD categories", size(small))) graphregion(fcolor(white))
- 29. 
+>     title("IMD categories", size(small))) graphregion(fcolor(white)) saving(`
+> this_outcome'_diff, replace) title(`this_title')
+ 30. 
 .     graph export ./output/graphs/line_`this_outcome'_diff_imd.svg, as(svg) re
 > place
- 30.     * Export data file for output checking 
+ 31.     * Export data file for output checking 
 .     export delimited using ./output/graphs/line_data_`this_outcome'_diff_imd.
 > csv
- 31.     }
+ 32.     }
 (5 vars, 276 obs)
   46
 (46 observations deleted)
@@ -123,6 +126,8 @@ value5          float   %9.0g                 5 value
 percent5        float   %9.0g                 5 percent
 -------------------------------------------------------------------------------
 Sorted by: dateA
+(note: file mi_admission.gph not found)
+(file mi_admission.gph saved)
 (note: file ./output/graphs/line_mi_admission_imd.svg not found)
 (file ./output/graphs/line_mi_admission_imd.svg written in SVG format)
 (1 missing value generated)
@@ -130,6 +135,8 @@ Sorted by: dateA
 (1 missing value generated)
 (1 missing value generated)
 (1 missing value generated)
+(note: file mi_admission_diff.gph not found)
+(file mi_admission_diff.gph saved)
 (note: file ./output/graphs/line_mi_admission_diff_imd.svg not found)
 (file ./output/graphs/line_mi_admission_diff_imd.svg written in SVG format)
 file ./output/graphs/line_data_mi_admission_diff_imd.csv saved
@@ -182,6 +189,8 @@ value5          float   %9.0g                 5 value
 percent5        float   %9.0g                 5 percent
 -------------------------------------------------------------------------------
 Sorted by: dateA
+(note: file stroke_admission.gph not found)
+(file stroke_admission.gph saved)
 (note: file ./output/graphs/line_stroke_admission_imd.svg not found)
 (file ./output/graphs/line_stroke_admission_imd.svg written in SVG format)
 (1 missing value generated)
@@ -189,6 +198,8 @@ Sorted by: dateA
 (1 missing value generated)
 (1 missing value generated)
 (1 missing value generated)
+(note: file stroke_admission_diff.gph not found)
+(file stroke_admission_diff.gph saved)
 (note: file ./output/graphs/line_stroke_admission_diff_imd.svg not found)
 (file ./output/graphs/line_stroke_admission_diff_imd.svg written in SVG format)
 file ./output/graphs/line_data_stroke_admission_diff_imd.csv saved
@@ -241,6 +252,8 @@ value5          float   %9.0g                 5 value
 percent5        float   %9.0g                 5 percent
 -------------------------------------------------------------------------------
 Sorted by: dateA
+(note: file heart_failure_admission.gph not found)
+(file heart_failure_admission.gph saved)
 (note: file ./output/graphs/line_heart_failure_admission_imd.svg not found)
 (file ./output/graphs/line_heart_failure_admission_imd.svg written in SVG forma
 > t)
@@ -249,6 +262,8 @@ Sorted by: dateA
 (1 missing value generated)
 (1 missing value generated)
 (1 missing value generated)
+(note: file heart_failure_admission_diff.gph not found)
+(file heart_failure_admission_diff.gph saved)
 (note: file ./output/graphs/line_heart_failure_admission_diff_imd.svg not found
 > )
 (file ./output/graphs/line_heart_failure_admission_diff_imd.svg written in SVG 
@@ -303,6 +318,8 @@ value5          float   %9.0g                 5 value
 percent5        float   %9.0g                 5 percent
 -------------------------------------------------------------------------------
 Sorted by: dateA
+(note: file vte_admission.gph not found)
+(file vte_admission.gph saved)
 (note: file ./output/graphs/line_vte_admission_imd.svg not found)
 (file ./output/graphs/line_vte_admission_imd.svg written in SVG format)
 (1 missing value generated)
@@ -310,15 +327,34 @@ Sorted by: dateA
 (1 missing value generated)
 (1 missing value generated)
 (1 missing value generated)
+(note: file vte_admission_diff.gph not found)
+(file vte_admission_diff.gph saved)
 (note: file ./output/graphs/line_vte_admission_diff_imd.svg not found)
 (file ./output/graphs/line_vte_admission_diff_imd.svg written in SVG format)
 file ./output/graphs/line_data_vte_admission_diff_imd.csv saved
 
 . 
+. grc1leg mi_admission.gph heart_failure_admission.gph stroke_admission.gph vte
+> _admission.gph, altshrink legendfrom(mi_admission.gph)     graphregion(fcolor
+> (white))
+
+. graph export "./output/graphs/combined_england.svg", as(svg) replace
+(note: file ./output/graphs/combined_england.svg not found)
+(file ./output/graphs/combined_england.svg written in SVG format)
+
+. 
+. grc1leg mi_admission_diff.gph heart_failure_admission_diff.gph stroke_admissi
+> on_diff.gph vte_admission_diff.gph, altshrink legendfrom(mi_admission_diff.gp
+> h)    graphregion(fcolor(white))
+
+. graph export "./output/graphs/combined_diff_england.svg", as(svg) replace
+(note: file ./output/graphs/combined_diff_england.svg not found)
+(file ./output/graphs/combined_diff_england.svg written in SVG format)
+
 . 
 end of do-file
 
-. . file open output using "/tmp/102_graphs.do.UC09.out", write text replace
+. . file open output using "/tmp/102_graphs.do.74Gg.out", write text replace
 
 . . file write output "success" 
 

@@ -38,7 +38,7 @@ forvalues i=1/4 {
     label var percent5 "IMD 5"
 
     * Generate line graph
-    graph twoway line percent1 percent2 percent3 percent4 percent5 date, tlabel(01Mar2018(120)31Dec2021, angle(45) ///
+    graph twoway line percent1 percent2 percent3 percent4 percent5 date, tlabel(01Mar2018(90)30Nov2021, angle(45) ///
     format(%dM-CY) labsize(small)) ytitle("Percentage") xtitle("Date") ylabel(0(0.01)0.03, labsize(small) ///
     angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
     title("IMD categories", size(small))) graphregion(fcolor(white))
@@ -57,7 +57,7 @@ forvalues i=1/4 {
     label var first_derivative4 "IMD 4"
     label var first_derivative5 "IMD 5"
     * Plot this
-    graph twoway line first_derivative1 first_derivative2 first_derivative3 first_derivative4 first_derivative5 date, tlabel(01Mar2018(120)31Dec2021, angle(45) ///
+    graph twoway line first_derivative1 first_derivative2 first_derivative3 first_derivative4 first_derivative5 date, tlabel(01Mar2018(90)30Nov2021, angle(45) ///
     format(%dM-CY) labsize(small)) ytitle("Absolute difference") xtitle("Date") ylabel(-0.01(0.005)0.01, labsize(small) ///
     angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
     title("IMD categories", size(small))) graphregion(fcolor(white))

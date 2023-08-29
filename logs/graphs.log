@@ -37,7 +37,7 @@
  17. 
 .     * Generate line graph
 .     graph twoway line percent1 percent2 percent3 percent4 percent5 date, tlab
-> el(01Mar2018(120)31Dec2021, angle(45) ///
+> el(01Mar2018(90)30Nov2021, angle(45) ///
 >     format(%dM-CY) labsize(small)) ytitle("Percentage") xtitle("Date") ylabel
 > (0(0.01)0.03, labsize(small) ///
 >     angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small
@@ -60,8 +60,8 @@
  27.     label var first_derivative5 "IMD 5"
  28.     * Plot this
 .     graph twoway line first_derivative1 first_derivative2 first_derivative3 f
-> irst_derivative4 first_derivative5 date, tlabel(01Mar2018(120)31Dec2021, angl
-> e(45) ///
+> irst_derivative4 first_derivative5 date, tlabel(01Mar2018(90)30Nov2021, angle
+> (45) ///
 >     format(%dM-CY) labsize(small)) ytitle("Absolute difference") xtitle("Date
 > ") ylabel(-0.01(0.005)0.01, labsize(small) ///
 >     angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small
@@ -318,7 +318,7 @@ file ./output/graphs/line_data_vte_admission_diff_imd.csv saved
 . 
 end of do-file
 
-. . file open output using "/tmp/102_graphs.do.Bt4z.out", write text replace
+. . file open output using "/tmp/102_graphs.do.UC09.out", write text replace
 
 . . file write output "success" 
 

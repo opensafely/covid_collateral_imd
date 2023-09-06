@@ -37,7 +37,7 @@ tab3_function <- function(outcome){
   # convert dateA variable to R accepted format
   df_outcome$dateA <- lubridate::as_date(df_outcome$dateA, format = "%d/%B/%y")
   
-  start_lockdown = as.Date("2020-03-23")
+  start_lockdown = as.Date("2020-03-01")
   end_post_lockdown_period = as.Date("2022-12-31")
   # Taken out code for creating variables as I have done this in Stata
   ## model Poisson 

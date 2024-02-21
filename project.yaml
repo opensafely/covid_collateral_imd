@@ -91,7 +91,7 @@ actions:
         log: logs/graphs.log
         output: output/graphs/line_*.svg
         data: output/graphs/line_*.csv
-        graphs: output/graphs/combine*
+        graphs: output/graphs/combine*.svg
 
   poisson_prep:
     run: stata-mp:latest analysis/103_poisson_prep.do

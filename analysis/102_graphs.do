@@ -12,7 +12,7 @@ cap mkdir ./output/graphs
 
 * CVD outcomes only
 local outcomes "mi_admission stroke_admission heart_failure_admission vte_admission"
-local titles "MI Stroke HF VTE"
+local titles "a b c d"
 forvalues i=1/4 {
     local this_outcome: word `i' of `outcomes'
 	local this_title: word `i' of `titles'
@@ -34,17 +34,17 @@ forvalues i=1/4 {
     reshape wide value percent population `this_outcome', i(dateA) j(imd)
     describe
     * Labelling IMD variables
-    label var percent1 "IMD 1"
+    label var percent1 "IMD 1 (Most deprived)"
     label var percent2 "IMD 2"
     label var percent3 "IMD 3"
     label var percent4 "IMD 4"
-    label var percent5 "IMD 5"
+    label var percent5 "IMD 5 (Least deprived)"
 
     * Generate line graph
-    graph twoway line percent1 percent2 percent3 percent4 percent5 date, tlabel(01Mar2018(90)30Nov2021, angle(45) ///
-    format(%dM-CY) labsize(small)) ytitle("Percentage") xtitle("Date") ylabel(0(0.01)0.03, labsize(small) ///
-    angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
-    title("IMD categories", size(small))) graphregion(fcolor(white)) saving(`this_outcome', replace) title(`this_title')
+    graph twoway line percent1 percent2 percent3 percent4 percent5 dateA, tlabel(01Mar2018(90)30Nov2021, angle(45) ///
+    format(%dM-CY) labsize(small)) ytitle("Percentage of population with the outcome") xtitle("Date") ylabel(0(0.01)0.03, labsize(small) ///
+    angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(2) size(small)  ///
+    title("IMD categories", size(small))) graphregion(fcolor(white)) saving(`this_outcome', replace) title(`this_title') 
 
     graph export ./output/graphs/line_`this_outcome'_imd.svg, as(svg) replace
 
@@ -54,15 +54,15 @@ forvalues i=1/4 {
         gen first_derivative`j' = percent`j' - percent`j'[_n-1]
         }
     * Label variables 
-    label var first_derivative1 "IMD 1"
+    label var first_derivative1 "IMD 1 (Most deprived)"
     label var first_derivative2 "IMD 2"
     label var first_derivative3 "IMD 3"
     label var first_derivative4 "IMD 4"
-    label var first_derivative5 "IMD 5"
+    label var first_derivative5 "IMD 5 (Least deprived)"
     * Plot this
     graph twoway line first_derivative1 first_derivative2 first_derivative3 first_derivative4 first_derivative5 date, tlabel(01Mar2018(90)30Nov2021, angle(45) ///
     format(%dM-CY) labsize(small)) ytitle("Absolute difference") xtitle("Date") ylabel(-0.01(0.005)0.01, labsize(small) ///
-    angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(1) size(small) ///
+    angle(0)) yscale(r(0) titlegap(*10)) xmtick(##6) legend(row(2) size(small) ///
     title("IMD categories", size(small))) graphregion(fcolor(white)) saving(`this_outcome'_diff, replace) title(`this_title')
 
     graph export ./output/graphs/line_`this_outcome'_diff_imd.svg, as(svg) replace
